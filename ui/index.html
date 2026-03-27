@@ -1,10 +1,9 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- ✅ Tailwind -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <title>Face Attendance</title>
@@ -25,10 +24,60 @@
             .then(res => res.text())
             .then(data => document.getElementById("app").innerHTML = data);
 
-        fetch("components/footer.html")
-            .then(res => res.text())
-            .then(data => document.getElementById("footer").innerHTML = data);
     </script>
+
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Face Attendance</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+
+
+
+  <!-- Main App -->
+  <div id="app" >
+    <!-- Loader -->
+    <div class="text-gray-500 text-sm animate-pulse">Loading...</div>
+  </div>
+
+  <script>
+    // reusable loader
+    function loadComponent(id, file) {
+      fetch(file)
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to load " + file);
+          return res.text();
+        })
+        .then(data => {
+          document.getElementById(id).innerHTML = data;
+        })
+        .catch(err => {
+          document.getElementById(id).innerHTML =
+            `<div class="text-red-500 text-center py-10">${err.message}</div>`;
+        });
+    }
+
+
+    // default page
+    loadComponent("app", "pages/landing.html");
+
+    // SPA navigation
+    function navigate(page) {
+      loadComponent("app", `pages/${page}.html`);
+      window.scrollTo(0, 0);
+    }
+  </script>
 
 </body>
 </html>

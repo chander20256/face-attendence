@@ -1,149 +1,390 @@
-<!-- HERO -->
-<section class="min-h-[90vh] flex items-center">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FaceAttend — Attendance System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark:  #14532d;
+    --green-mid:   #16a34a;
+    --green-light: #22c55e;
+    --green-pale:  #dcfce7;
+    --white:       #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    overflow-y: auto;
+  }
+
+  /* ========================
+     STATIC BACKGROUND IMAGE
+  ======================== */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url('assets/Backgroundimg.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* Dark overlay for text readability */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      rgba(5, 30, 12, 0.50) 0%,
+      rgba(5, 25, 10, 0.38) 40%,
+      rgba(5, 30, 12, 0.68) 100%
+    );
+  }
+
+  /* ========================
+     MAIN CONTENT
+  ======================== */
+  .page {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px 90px 20px;
+    text-align: center;
+  }
+
+  /* College logo */
+  .college-logo {
+    width: 110px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    animation: logoReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+    flex-shrink: 0;
+  }
+
+  .college-logo img {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
+  }
+
+  @keyframes logoReveal {
+    from { transform: scale(0.5) translateY(-20px); opacity: 0; }
+    to   { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  /* College name */
+  .college-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9);
+    margin-bottom: 28px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  /* Welcome line */
+  .welcome-line {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 400;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 14px;
+    animation: fadeUp 0.7s 0.35s ease both;
+  }
+
+  /* Main heading */
+  .main-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 18px;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.55);
+    animation: fadeUp 0.7s 0.45s ease both;
+  }
+
+  .main-heading span {
+    color: var(--green-light);
+    display: block;
+  }
+
+  /* Tagline */
+  .tagline {
+    font-size: clamp(14px, 1.6vw, 17px);
+    font-weight: 300;
+    color: rgba(255,255,255,0.78);
+    max-width: 520px;
+    line-height: 1.75;
+    margin-bottom: 44px;
+    animation: fadeUp 0.7s 0.55s ease both;
+  }
+
+  /* Buttons */
+  .btn-group {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.7s 0.7s ease both;
+  }
+
+  .btn {
+    padding: 16px 44px;
+    border-radius: 5px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  .btn:hover::after { background: rgba(255,255,255,0.1); }
+  .btn:hover        { transform: translateY(-3px); }
+
+  .btn-primary {
+    background: var(--green-mid);
+    color: white;
+    box-shadow: 0 4px 24px rgba(22,163,74,0.55);
+    animation: glowPulse 3s ease-in-out infinite 1.5s;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 4px 24px rgba(22,163,74,0.55); }
+    50%       { box-shadow: 0 4px 44px rgba(22,163,74,0.85); }
+  }
+
+  .btn-primary:hover { box-shadow: 0 8px 40px rgba(22,163,74,0.75); }
+
+  .btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.72);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  .btn-outline:hover {
+    border-color: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+  }
+
+  /* Stats row */
+  .stats {
+    display: flex;
+    gap: 50px;
+    margin-top: 52px;
+    animation: fadeUp 0.7s 0.85s ease both;
+    padding-top: 34px;
+    border-top: 1px solid rgba(255,255,255,0.18);
+  }
+
+  .stat { text-align: center; }
+
+  .stat-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 27px;
+    font-weight: 500;
+    color: var(--green-light);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.52);
+  }
+
+  .stat-divider {
+    width: 1px;
+    background: rgba(255,255,255,0.18);
+    align-self: stretch;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Bottom nav bar */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
+    background: rgba(5, 25, 10, 0.65);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bottom-links { display: flex; gap: 28px; }
+
+  .bottom-link {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .bottom-link:hover { color: var(--green-light); }
+
+  .sys-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green-light);
+    box-shadow: 0 0 8px var(--green-light);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  @media (max-width: 600px) {
+    .stats { gap: 24px; }
+    .btn { padding: 13px 26px; font-size: 13px; }
+    .bottom-nav { flex-direction: column; gap: 8px; padding: 12px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Static background image -->
+<div class="bg"></div>
+
+<!-- Dark overlay -->
+<div class="overlay"></div>
+
+<!-- MAIN CONTENT -->
+<div class="page">
+
+  <!-- College Logo -->
+  <div class="college-logo">
+    <img src="assets/Logo.jpeg" alt="College Logo">
+  </div>
+
+  <!-- College name -->
+  <div class="college-name">Green Hills Engineering College &nbsp;&middot;&nbsp; Est. 2003</div>
+
+  <!-- Welcome line -->
+  <div class="welcome-line">Welcome to</div>
+
+  <!-- Main heading -->
+  <h1 class="main-heading">
+    Attendance System
+    <span>Using Facial Recognition</span>
+  </h1>
+
+  <!-- Tagline -->
+  <p class="tagline">
+    Powered by facial recognition technology &mdash; secure, contactless, and effortless attendance tracking for students.
+  </p>
+
+  <!-- CTA Buttons -->
+  <div class="btn-group">
     
-    <div class="w-full max-w-7xl mx-auto px-6 lg:px-12 py-16 flex flex-col-reverse md:flex-row items-center justify-between gap-10">
+    <a href="#" onclick="navigate('attendance')" class="btn btn-primary">Mark Attendance</a>
+    
+    
+    <a href="#" onclick="navigate('register')" class="btn btn-outline">Register</a>
+  </div>
 
-        <!-- LEFT -->
-        <div class="w-full md:w-1/2 text-center md:text-left">
-            
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Smart Face Attendance System
-            </h1>
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">2,400+</span>
+      <span class="stat-label">Students Enrolled</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">98.6%</span>
+      <span class="stat-label">Recognition Accuracy</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <span class="stat-num">&lt; 2s</span>
+      <span class="stat-label">Avg. Scan Time</span>
+    </div>
+  </div>
 
-            <p class="text-gray-600 text-base md:text-lg mb-8 max-w-lg mx-auto md:mx-0">
-                Automate attendance using AI-powered face recognition. Fast, secure, and efficient for modern institutions.
-            </p>
-
-            <!-- BUTTONS -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                
-                <button class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-800 transition">
-                    Get Started
-                </button>
-
-                <button class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
-                    Learn More
-                </button>
-
-            </div>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="w-full md:w-1/2 flex justify-center items-center">
-    <img 
-        src="../assets/Hero-image.png" 
-        alt="Hero Image"
-        class="w-[90%] sm:w-[85%] md:w-[95%] lg:w-[550px] xl:w-[650px] max-w-full h-auto"
-    />
 </div>
 
-    </div>
+<!-- Bottom nav -->
+<div class="bottom-nav">
+  <div class="bottom-links">
+     <a href="#" onclick="navigate('register')" class="bottom-link">Register</a>
+     <a href="#" onclick="navigate('attendance')" class="bottom-link">Attendance</a>
+    <a href="#" class="bottom-link">Help</a>
+  </div>
+  <div class="sys-status">
+    <div class="status-dot"></div>
+    System Online
+  </div>
+</div>
 
-</section>
-
-
-<!-- FEATURES -->
-<section class="bg-white">
-
-    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-24 text-center">
-
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Powerful Features for Smart Attendance
-        </h2>
-
-        <p class="text-gray-500 mb-16 max-w-2xl mx-auto">
-            Our system combines AI, security, and automation to deliver a seamless attendance experience for institutions and organizations.
-        </p>
-
-        <!-- GRID -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-
-            <!-- Face Detection -->
-            <div class="p-6 bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left border border-transparent hover:border-blue-200">
-                <div class="text-3xl mb-4">📸</div>
-                <h3 class="font-semibold text-lg mb-2">Face Detection</h3>
-                <p class="text-gray-500 mb-4">
-                    Detect and recognize faces instantly using advanced AI algorithms with high accuracy and speed.
-                </p>
-                <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✔ Real-time recognition</li>
-                    <li>✔ High accuracy detection</li>
-                    <li>✔ Works in low light</li>
-                </ul>
-            </div>
-
-            <!-- Real Time -->
-            <div class="p-6 bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left border border-transparent hover:border-blue-200">
-                <div class="text-3xl mb-4">⚡</div>
-                <h3 class="font-semibold text-lg mb-2">Real-Time Data Store</h3>
-                <p class="text-gray-500 mb-4">
-                    Attendance is recorded instantly and stored securely for quick access and analytics.
-                </p>
-                <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✔ Instant updates</li>
-                    <li>✔ Secure database</li>
-                    <li>✔ Live tracking</li>
-                </ul>
-            </div>
-
-            <!-- Retina -->
-            <div class="p-6 bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left border border-transparent hover:border-blue-200">
-                <div class="text-3xl mb-4">👁️</div>
-                <h3 class="font-semibold text-lg mb-2">Eye Retina Scanner</h3>
-                <p class="text-gray-500 mb-4">
-                    Add an extra layer of security with biometric retina scanning for authentication.
-                </p>
-                <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✔ High-level security</li>
-                    <li>✔ Anti-spoof detection</li>
-                    <li>✔ Fast verification</li>
-                </ul>
-            </div>
-
-            <!-- Reports -->
-            <div class="p-6 bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left border border-transparent hover:border-blue-200">
-                <div class="text-3xl mb-4">📊</div>
-                <h3 class="font-semibold text-lg mb-2">Monthly Reports</h3>
-                <p class="text-gray-500 mb-4">
-                    Automatically generate detailed attendance reports with insights and analytics.
-                </p>
-                <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✔ Auto-generated reports</li>
-                    <li>✔ Export to PDF/Excel</li>
-                    <li>✔ Performance insights</li>
-                </ul>
-            </div>
-
-            <!-- Anti Spoof -->
-            <div class="p-6 bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left border border-transparent hover:border-red-200">
-                <div class="text-3xl mb-4">🛡️</div>
-                <h3 class="font-semibold text-lg mb-2">Anti-Spoofing Security</h3>
-                <p class="text-gray-500 mb-4">
-                    Prevent fake attendance attempts using photos or videos with advanced liveness detection.
-                </p>
-                <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✔ Detects fake inputs</li>
-                    <li>✔ Liveness detection</li>
-                    <li>✔ Enhanced protection</li>
-                </ul>
-            </div>
-
-            <!-- Admin Access -->
-            <div class="p-6 bg-gray-50 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left border border-transparent hover:border-purple-200">
-                <div class="text-3xl mb-4">🔐</div>
-                <h3 class="font-semibold text-lg mb-2">Admin-Only Access</h3>
-                <p class="text-gray-500 mb-4">
-                    Restrict sensitive controls and data access to authorized administrators only.
-                </p>
-                <ul class="text-sm text-gray-600 space-y-1">
-                    <li>✔ Role-based control</li>
-                    <li>✔ Secure dashboard</li>
-                    <li>✔ Data protection</li>
-                </ul>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
+<script>
+  function tick() {
+    const now = new Date();
+    const t = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const d = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+    const el = document.querySelector('.sys-status');
+    if (el) el.innerHTML = `<div class="status-dot"></div> System Online &nbsp;&middot;&nbsp; ${d}, ${t}`;
+  }
+  setInterval(tick, 1000);
+  tick();
+</script>
+</body>
+</html>

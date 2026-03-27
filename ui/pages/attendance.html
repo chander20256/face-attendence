@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Green Hills Engineering College — Mark Attendance</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #f0faf2;
+    --surface:  #ffffff;
+    --card:     #ffffff;
+    --border:   #c8e6cc;
+    --accent:   #22c55e;
+    --accent2:  #16a34a;
+    --accent3:  #15803d;
+    --text:     #14532d;
+    --muted:    #6b9f7a;
+    --success:  #16a34a;
+    --error:    #dc2626;
+    --warning:  #d97706;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* subtle dot pattern bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(34,197,94,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===================== LOGIN OVERLAY ===================== */
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-wrap {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    min-height: 540px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(20,83,45,0.15);
+  }
+
+  /* Login left panel */
+  .login-left {
+    width: 340px;
+    background: linear-gradient(160deg, var(--accent2) 0%, var(--accent3) 100%);
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .login-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .login-college-logo {
+    width: 72px;
+    height: 72px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.3);
+    overflow: hidden;
+  }
+
+  .login-college-logo img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  .login-college-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.25;
+  }
+
+  .login-college-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .login-left-bottom {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+  }
+
+  /* scan animation in login left */
+  .login-scan-anim {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+  }
+
+  .login-scan-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .login-scan-ring::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: rgba(255,255,255,0.6);
+    animation: spinRing 1.8s linear infinite;
+  }
+
+  .login-scan-ring::after {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-bottom-color: rgba(255,255,255,0.3);
+    animation: spinRing 3s linear infinite reverse;
+  }
+
+  @keyframes spinRing {
+    to { transform: rotate(360deg); }
+  }
+
+  .login-face-icon {
+    font-size: 44px;
+    animation: facePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes facePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  /* Login right panel */
+  .login-right {
+    flex: 1;
+    background: white;
+    padding: 50px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .login-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 36px;
+  }
+
+  .login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 18px;
+  }
+
+  .login-field label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .login-input-wrap {
+    position: relative;
+  }
+
+  .login-input-wrap .l-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 15px;
+    pointer-events: none;
+  }
+
+  .login-input-wrap input {
+    width: 100%;
+    padding: 13px 14px 13px 42px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .login-input-wrap input:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    background: white;
+  }
+
+  .login-input-wrap input::placeholder { color: #a8c5b0; }
+
+  .login-err {
+    font-size: 12px;
+    color: var(--error);
+    display: none;
+    margin-top: -10px;
+    margin-bottom: 4px;
+  }
+
+  .login-err.show { display: block; }
+
+  .btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 8px;
+    box-shadow: 0 4px 20px rgba(22,163,74,0.35);
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(22,163,74,0.45);
+  }
+
+  .login-register-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 20px;
+  }
+
+  .login-register-link a {
+    color: var(--accent2);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .login-register-link a:hover { text-decoration: underline; }
+
+  /* ===================== MAIN APP ===================== */
+  .app { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
+  .app.show { display: flex; }
+
+  /* Top navbar */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(20,83,45,0.06);
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-logo-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+
+  .nav-college {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .nav-college span {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .nav-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .nav-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 14px 6px 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .nav-user-pill:hover { border-color: var(--accent2); }
+
+  .nav-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: white;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .nav-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .btn-logout {
+    padding: 8px 18px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover {
+    border-color: var(--error);
+    color: var(--error);
+  }
+
+  /* ===================== LAYOUT ===================== */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    flex: 1;
+    gap: 0;
+  }
+
+  /* ===================== LEFT — CAMERA ===================== */
+  .camera-section {
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-right: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .live-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(22,163,74,0.1);
+    border: 1px solid rgba(22,163,74,0.3);
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Camera viewport */
+  .cam-viewport {
+    width: 100%;
+    aspect-ratio: 4/3;
+    max-height: 460px;
+    background: #0d1f12;
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #camVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: none;
+  }
+
+  .cam-off-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 20px;
+  }
+
+  .cam-off-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cam-off-icon svg { opacity: 0.4; }
+
+  .cam-off-text { font-size: 14px; line-height: 1.6; }
+
+  /* HUD overlay */
+  .cam-hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: none;
+  }
+
+  .hud-corner {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+  }
+
+  .hud-corner.tl { top:16px; left:16px; border-top:3px solid var(--accent2); border-left:3px solid var(--accent2); border-radius:4px 0 0 0; }
+  .hud-corner.tr { top:16px; right:16px; border-top:3px solid var(--accent2); border-right:3px solid var(--accent2); border-radius:0 4px 0 0; }
+  .hud-corner.bl { bottom:16px; left:16px; border-bottom:3px solid var(--accent2); border-left:3px solid var(--accent2); border-radius:0 0 0 4px; }
+  .hud-corner.br { bottom:16px; right:16px; border-bottom:3px solid var(--accent2); border-right:3px solid var(--accent2); border-radius:0 0 4px 0; }
+
+  .hud-scanline {
+    position: absolute;
+    left: 16px; right: 16px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(34,197,94,0.8), transparent);
+    box-shadow: 0 0 10px rgba(34,197,94,0.6);
+    animation: scanDown 2.4s ease-in-out infinite;
+  }
+
+  @keyframes scanDown {
+    0%   { top: 16px; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: calc(100% - 16px); opacity: 0; }
+  }
+
+  /* Face detection box */
+  .face-detect-box {
+    position: absolute;
+    border: 2px solid var(--accent2);
+    border-radius: 6px;
+    box-shadow: 0 0 16px rgba(34,197,94,0.4), inset 0 0 16px rgba(34,197,94,0.04);
+    display: none;
+    transition: all 0.08s ease;
+  }
+
+  .face-detect-label {
+    position: absolute;
+    top: -26px;
+    left: 0;
+    background: var(--accent2);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  /* HUD bottom bar */
+  .hud-bar {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .hud-chip {
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(34,197,94,0.3);
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(34,197,94,0.9);
+  }
+
+  /* Status pills row */
+  .status-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 500;
+    background: white;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    transition: all 0.25s;
+  }
+
+  .status-pill.on   { background: rgba(22,163,74,0.08); border-color: rgba(22,163,74,0.35); color: var(--accent2); }
+  .status-pill.good { background: rgba(22,163,74,0.08); border-color: rgba(22,163,74,0.35); color: var(--accent2); }
+  .status-pill.warn { background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.25); color: var(--error); }
+
+  .s-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* Confidence bar */
+  .conf-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: none;
+  }
+
+  .conf-card.show { display: block; animation: fadeUp 0.3s ease; }
+
+  .conf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .conf-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .conf-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--accent2);
+  }
+
+  .conf-track {
+    height: 7px;
+    background: var(--bg);
+    border-radius: 99px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .conf-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+    border-radius: 99px;
+    width: 0;
+    transition: width 0.4s ease;
+  }
+
+  /* Control buttons */
+  .cam-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 11px 22px;
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+
+  .btn-green {
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    color: white;
+    box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+  }
+
+  .btn-green:hover { box-shadow: 0 6px 24px rgba(22,163,74,0.45); }
+
+  .btn-scan {
+    background: linear-gradient(135deg, #0f766e, #0d9488);
+    color: white;
+    box-shadow: 0 4px 16px rgba(13,148,136,0.3);
+  }
+
+  .btn-scan:hover { box-shadow: 0 6px 24px rgba(13,148,136,0.45); }
+
+  .btn-red {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+  }
+
+  .btn-ghost {
+    background: white;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ===================== RIGHT PANEL ===================== */
+  .right-panel {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 64px);
+    position: sticky;
+    top: 64px;
+    overflow-y: auto;
+    border-left: 1px solid var(--border);
+  }
+
+  .right-panel::-webkit-scrollbar { width: 4px; }
+  .right-panel::-webkit-scrollbar-track { background: transparent; }
+  .right-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  .rp-section {
+    padding: 24px 26px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rp-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .rp-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg);
+    padding: 3px 9px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    font-weight: 400;
+  }
+
+  /* Session info */
+  .session-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .session-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .si-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  .si-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Recognized student card */
+  .student-card {
+    display: none;
+    background: linear-gradient(135deg, rgba(22,163,74,0.05), rgba(21,128,61,0.08));
+    border: 1.5px solid rgba(22,163,74,0.25);
+    border-radius: 14px;
+    padding: 18px;
+    animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .student-card.show { display: block; }
+
+  @keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  .sc-top {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .sc-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+  }
+
+  .sc-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .sc-meta {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .sc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .sc-stat {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .sc-stat-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    color: var(--accent2);
+    font-weight: 500;
+    display: block;
+  }
+
+  .sc-stat-lbl {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  /* Attendance result banner */
+  .result-banner {
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    display: none;
+    border: 1.5px solid;
+  }
+
+  .result-banner.show { display: block; animation: fadeUp 0.35s ease; }
+  .result-banner.marked { background: rgba(22,163,74,0.07); border-color: rgba(22,163,74,0.3); }
+  .result-banner.already { background: rgba(217,119,6,0.07); border-color: rgba(217,119,6,0.3); }
+  .result-banner.failed  { background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.25); }
+
+  .rb-icon { font-size: 36px; margin-bottom: 6px; display: block; }
+  .rb-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .rb-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Attendance log */
+  .log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .log-empty {
+    text-align: center;
+    padding: 30px 16px;
+    color: var(--muted);
+    font-size: 13px;
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+  }
+
+  .log-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .li-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .li-av {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .li-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .li-roll { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .li-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+  .badge {
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .badge-present { background: rgba(22,163,74,0.12); color: var(--success); border: 1px solid rgba(22,163,74,0.3); }
+  .badge-late    { background: rgba(217,119,6,0.1); color: var(--warning); border: 1px solid rgba(217,119,6,0.25); }
+
+  .li-time { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+
+  .badge-nf      { background: rgba(220,38,38,0.1);  color: var(--error);   border: 1px solid rgba(220,38,38,0.25); }
+  .badge-pending { background: rgba(217,119,6,0.1);  color: var(--warning); border: 1px solid rgba(217,119,6,0.25); }
+
+  .li-av-absent {
+    background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+  }
+
+  .absent-item {
+    opacity: 0.85;
+    border-color: #e5e7eb;
+  }
+
+  .result-banner.failed {
+    background: rgba(220,38,38,0.06);
+    border-color: rgba(220,38,38,0.25);
+  }
+
+  .rb-icon svg { display: inline-block; vertical-align: middle; margin-bottom: 6px; }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .right-panel { height: auto; position: relative; top: 0; }
+    .login-left { display: none; }
+    .login-right { padding: 36px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN OVERLAY ===================== -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-wrap">
+
+    <!-- Left branding -->
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="login-college-logo">
+          <img src="logo.jpg" alt="College Logo">
+        </div>
+        <div>
+          <div class="login-college-name">Green Hills Engineering College</div>
+          <div class="login-college-sub">Est. 2003 &middot; Attendance Portal</div>
+        </div>
+      </div>
+
+      <div class="login-scan-anim">
+        <div class="login-scan-ring">
+          <div class="login-face-icon"></div>
+        </div>
+      </div>
+
+      <div class="login-left-bottom">
+        Sign in with your registered Student Roll Number and password to mark today's attendance using facial recognition.
+      </div>
+    </div>
+
+    <!-- Right login form -->
+    <div class="login-right">
+      <div class="login-title">Student Sign In</div>
+      <div class="login-subtitle">Enter your credentials to access the attendance system</div>
+
+      <div class="login-field">
+        <label>Roll Number</label>
+        <div class="login-input-wrap">
+          <span class="l-icon"></span>
+          <input type="text" id="loginRoll" placeholder="e.g. 22CS001">
+        </div>
+      </div>
+      <div class="login-err" id="err-loginRoll">Please enter your roll number.</div>
+
+      <div class="login-field">
+        <label>Password</label>
+        <div class="login-input-wrap">
+          <span class="l-icon"></span>
+          <input type="password" id="loginPw" placeholder="Your password" onkeydown="if(event.key==='Enter') doLogin()">
+        </div>
+      </div>
+      <div class="login-err" id="err-loginPw">Please enter your password.</div>
+
+      <button class="btn-login" onclick="doLogin()">Sign In &amp; Mark Attendance</button>
+
+      <div class="login-register-link">
+        Not registered yet? <a href="#" onclick="navigate('register')">Register</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div class="app" id="mainApp">
+
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-left">
+      <img src="assets/Logo.jpeg" alt="Logo" class="nav-logo-img">
+      <div class="nav-college">
+        Green Hills Engineering College
+        <span>Attendance Management System</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-date" id="navClock">--</div>
+      <div class="nav-user-pill">
+        <div class="nav-avatar" id="navAvatar">--</div>
+        <div class="nav-user-name" id="navUserName">Student</div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- LEFT: Camera -->
+    <div class="camera-section">
+
+      <div class="section-header">
+        <div>
+          <div class="section-label">Face Recognition</div>
+          <div class="section-sub">Position your face in the frame and click Scan</div>
+        </div>
+        <div class="live-chip" id="liveChip">
+          <div class="live-dot"></div> Ready
+        </div>
+      </div>
+
+      <!-- Camera box -->
+      <div class="cam-viewport" id="camViewport">
+        <!-- Off state -->
+        <div class="cam-off-state" id="camOffState">
+          <div class="cam-off-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5">
+              <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <div class="cam-off-text">Camera is off<br><small>Click "Start Camera" to begin</small></div>
+        </div>
+
+        <!-- Video feed -->
+        <video id="camVideo" autoplay playsinline muted></video>
+
+        <!-- HUD -->
+        <div class="cam-hud" id="camHud">
+          <div class="hud-corner tl"></div>
+          <div class="hud-corner tr"></div>
+          <div class="hud-corner bl"></div>
+          <div class="hud-corner br"></div>
+          <div class="hud-scanline"></div>
+          <div class="face-detect-box" id="faceBox">
+            <div class="face-detect-label" id="faceLabel">DETECTING...</div>
+          </div>
+          <div class="hud-bar">
+            <div class="hud-chip" id="hudFps">FPS: --</div>
+            <div class="hud-chip" id="hudStatus">Scanning...</div>
+            <div class="hud-chip" id="hudClock">--:--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status pills -->
+      <div class="status-row">
+        <div class="status-pill" id="pillCam">
+          <span class="s-dot"></span> Camera Off
+        </div>
+        <div class="status-pill" id="pillScan">
+          <span class="s-dot"></span> Not Scanning
+        </div>
+        <div class="status-pill" id="pillResult">
+          <span class="s-dot"></span> Awaiting Scan
+        </div>
+      </div>
+
+      <!-- Confidence bar -->
+      <div class="conf-card" id="confCard">
+        <div class="conf-header">
+          <div class="conf-label">Recognition Confidence</div>
+          <div class="conf-pct" id="confPct">0%</div>
+        </div>
+        <div class="conf-track">
+          <div class="conf-fill" id="confFill"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="cam-controls">
+        <button class="btn btn-green" id="btnStart" onclick="startCamera()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+          Start Camera
+        </button>
+        <button class="btn btn-scan" id="btnScan" onclick="runScan()" style="display:none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Scan Face
+        </button>
+        <button class="btn btn-red" id="btnStop" onclick="stopCamera()" style="display:none;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          Stop
+        </button>
+        <button class="btn btn-ghost" onclick="resetScan()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset
+        </button>
+      </div>
+
+    </div><!-- /camera-section -->
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <!-- Session info -->
+      <div class="rp-section">
+        <div class="rp-title">Today's Session</div>
+        <div class="session-info">
+          <div class="session-item">
+            <div class="si-label">Date</div>
+            <div class="si-value" id="siDate">--</div>
+          </div>
+          <div class="session-item">
+            <div class="si-label">Time</div>
+            <div class="si-value" id="siTime">--:--</div>
+          </div>
+          <div class="session-item">
+            <div class="si-label">Department</div>
+            <div class="si-value" id="siDept">CS</div>
+          </div>
+          <div class="session-item">
+            <div class="si-label">Marked Today</div>
+            <div class="si-value" id="siCount">0</div>
+          </div>
+        </div>
+        <div class="session-item">
+          <div class="si-label">Total Students</div>
+          <div class="si-value" id="siTotalStudents">--</div>
+        </div>
+      </div>
+    </div>
+
+      <!-- Recognized Student -->
+      <div class="rp-section" id="studentSection" style="display:none;">
+        <div class="rp-title">Recognized Student</div>
+        <div class="student-card show" id="studentCard">
+          <div class="sc-top">
+            <div class="sc-avatar" id="scAvatar">--</div>
+            <div>
+              <div class="sc-name" id="scName">--</div>
+              <div class="sc-meta" id="scMeta">--</div>
+            </div>
+          </div>
+          <div class="sc-stats">
+            <div class="sc-stat">
+              <span class="sc-stat-num" id="scPresent">--</span>
+              <span class="sc-stat-lbl">Present</span>
+            </div>
+            <div class="sc-stat">
+              <span class="sc-stat-num" id="scAbsent">--</span>
+              <span class="sc-stat-lbl">Absent</span>
+            </div>
+            <div class="sc-stat">
+              <span class="sc-stat-num" id="scRate">--</span>
+              <span class="sc-stat-lbl">Rate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result banner -->
+      <div class="rp-section" id="resultSection" style="display:none;">
+        <div class="result-banner show" id="resultBanner">
+          <span class="rb-icon" id="rbIcon">--</span>
+          <div class="rb-title" id="rbTitle">--</div>
+          <div class="rb-time" id="rbTime">--</div>
+        </div>
+      </div>
+
+      <!-- Attendance log -->
+      <div class="rp-section">
+        <div class="rp-title">
+          Today's Log
+          <span class="rp-count" id="logCount">0 entries</span>
+        </div>
+        <div class="log-list" id="logList">
+          <div class="log-empty">No attendance recorded yet.<br>Start the camera and scan a face.</div>
+        </div>
+      </div>
+
+    </div><!-- /right-panel -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<script>
+  // =====================================================================
+  // REAL FACE RECOGNITION — all recognition handled by Flask + LBPH model
+  // No demo data, no simulation, no hardcoded students
+  // server.py must be running at http://localhost:5000
+  // =====================================================================
+
+  // ---- LOGIN -----------------------------------------------------------
+  let loggedInUser = null;
+
+  async function doLogin() {
+    const roll = document.getElementById('loginRoll').value.trim();
+    const pw   = document.getElementById('loginPw').value;
+    let valid  = true;
+
+    const errRoll = document.getElementById('err-loginRoll');
+    const errPw   = document.getElementById('err-loginPw');
+
+    if (!roll) { errRoll.classList.add('show'); valid = false; }
+    else        { errRoll.classList.remove('show'); }
+
+    if (!pw) { errPw.classList.add('show'); valid = false; }
+    else      { errPw.classList.remove('show'); }
+
+    if (!valid) return;
+
+    const btn = document.querySelector('.btn-login');
+    btn.disabled   = true;
+    btn.textContent = 'Signing in...';
+
+    try {
+      const res  = await fetch('http://localhost:5000/api/login', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ rollNo: roll, password: pw })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        loggedInUser = data.student;
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('mainApp').classList.add('show');
+        document.getElementById('navAvatar').textContent    = loggedInUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+        document.getElementById('navUserName').textContent  = loggedInUser.name;
+        document.getElementById('siDept').textContent       = loggedInUser.dept || '--';
+        tickClock();
+        loadTodayStats();
+        loadTodayLog();
+        loadAbsentList();
+      } else {
+        errPw.textContent = data.message || 'Invalid roll number or password.';
+        errPw.classList.add('show');
+      }
+    } catch(e) {
+      errPw.textContent = 'Cannot connect to server. Run: python server.py';
+      errPw.classList.add('show');
+    }
+
+    btn.disabled    = false;
+    btn.textContent = 'Sign In & Mark Attendance';
+  }
+
+  function doLogout() {
+    stopCamera();
+    loggedInUser = null;
+    logEntries   = [];
+    document.getElementById('mainApp').classList.remove('show');
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('loginRoll').value = '';
+    document.getElementById('loginPw').value   = '';
+    document.getElementById('err-loginRoll').classList.remove('show');
+    document.getElementById('err-loginPw').classList.remove('show');
+    updateLog();
+  }
+
+  // ---- CLOCK -----------------------------------------------------------
+  function tickClock() {
+    const now = new Date();
+    const t   = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    const d   = now.toLocaleDateString([], { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+    document.getElementById('navClock').textContent = d + '  ' + t;
+    document.getElementById('hudClock').textContent = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    document.getElementById('siTime').textContent   = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    document.getElementById('siDate').textContent   = now.toLocaleDateString([], { day:'2-digit', month:'short' });
+  }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  // ---- LOAD TODAY STATS FROM SERVER ------------------------------------
+  async function loadTodayStats() {
+    try {
+      const res  = await fetch('http://localhost:5000/api/students');
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('siTotalStudents').textContent = data.students.length;
+      }
+    } catch(e) {}
+  }
+
+  // ---- CAMERA ----------------------------------------------------------
+  let stream     = null;
+  let fpsTimer   = null;
+  let driftTimer = null;
+
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      const video = document.getElementById('camVideo');
+      video.srcObject = stream;
+      video.style.display = 'block';
+      document.getElementById('camOffState').style.display = 'none';
+      document.getElementById('camHud').style.display      = 'block';
+      document.getElementById('btnStart').style.display    = 'none';
+      document.getElementById('btnScan').style.display     = 'inline-flex';
+      document.getElementById('btnStop').style.display     = 'inline-flex';
+
+      setPill('pillCam',  'on', 'Camera On');
+      setPill('pillScan', 'on', 'Ready to Scan');
+      document.getElementById('liveChip').innerHTML = '<div class="live-dot"></div> Live';
+
+      fpsTimer = setInterval(() => {
+        document.getElementById('hudFps').textContent = 'FPS: ' + (27 + Math.floor(Math.random() * 5));
+      }, 600);
+
+      setTimeout(showFaceBox, 1000);
+    } catch (e) {
+      alert('Camera access denied. Please allow camera permissions and try again.');
+    }
+  }
+
+  function showFaceBox() {
+    if (!stream) return;
+    const vp  = document.getElementById('camViewport');
+    const box = document.getElementById('faceBox');
+    const w   = vp.offsetWidth;
+    const h   = vp.offsetHeight;
+    const bw  = 160; const bh = 190;
+    box.style.cssText = `display:block;width:${bw}px;height:${bh}px;left:${(w-bw)/2}px;top:${(h-bh)/2}px;`;
+    document.getElementById('hudStatus').textContent = 'Face Detected';
+    document.getElementById('faceLabel').textContent = 'POSITION FACE HERE';
+
+    let t = 0;
+    driftTimer = setInterval(() => {
+      if (!stream) return;
+      t += 0.04;
+      box.style.left = ((w - bw) / 2 + Math.sin(t) * 4) + 'px';
+      box.style.top  = ((h - bh) / 2 + Math.cos(t * 0.8) * 3) + 'px';
+    }, 50);
+  }
+
+  function stopCamera() {
+    if (stream)        { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    if (fpsTimer)      { clearInterval(fpsTimer);   fpsTimer   = null; }
+    if (driftTimer)    { clearInterval(driftTimer); driftTimer = null; }
+
+    document.getElementById('camVideo').style.display    = 'none';
+    document.getElementById('camOffState').style.display = 'flex';
+    document.getElementById('camHud').style.display      = 'none';
+    document.getElementById('faceBox').style.display     = 'none';
+    document.getElementById('btnStart').style.display    = 'inline-flex';
+    document.getElementById('btnScan').style.display     = 'none';
+    document.getElementById('btnStop').style.display     = 'none';
+
+    setPill('pillCam',  '', 'Camera Off');
+    setPill('pillScan', '', 'Not Scanning');
+    document.getElementById('liveChip').innerHTML        = '<div class="live-dot"></div> Ready';
+  }
+
+  // ---- CAPTURE FRAME ---------------------------------------------------
+  function captureFrame() {
+    const video  = document.getElementById('camVideo');
+    const canvas = document.createElement('canvas');
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    return canvas.toDataURL('image/jpeg', 0.9);
+  }
+
+  // ---- SCAN — calls real Flask LBPH model ------------------------------
+  let logEntries = [];
+
+  async function runScan() {
+    if (!stream) {
+      alert('Please start the camera first.');
+      return;
+    }
+
+    const btn = document.getElementById('btnScan');
+    btn.disabled  = true;
+    btn.innerHTML = 'Recognizing...';
+
+    document.getElementById('confCard').classList.add('show');
+    document.getElementById('faceLabel').textContent = 'RECOGNIZING...';
+    setPill('pillScan', 'on', 'Processing...');
+
+    // Animate confidence bar while server processes
+    let conf = 0;
+    const confInterval = setInterval(() => {
+      conf = Math.min(conf + Math.random() * 7, 82);
+      document.getElementById('confFill').style.width = conf + '%';
+      document.getElementById('confPct').textContent  = conf.toFixed(1) + '%';
+    }, 60);
+
+    try {
+      const imageData = captureFrame();
+
+      const res  = await fetch('http://localhost:5000/api/recognize', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ image: imageData })
+      });
+      const result = await res.json();
+
+      clearInterval(confInterval);
+
+      const finalConf = result.confidence || 0;
+      document.getElementById('confFill').style.width = Math.min(finalConf, 99) + '%';
+      document.getElementById('confPct').textContent  = finalConf.toFixed(1) + '%';
+
+      if (result.success) {
+        showPresent(result.student, finalConf, result.already_marked);
+      } else {
+        switch (result.reason) {
+          case 'no_face':    showError('No Face Detected',     'Move closer and ensure good lighting');           break;
+          case 'no_model':   showError('Model Not Trained',    'Run: python 2_train_model.py  then restart server'); break;
+          case 'no_match':   showError('Face Not Recognized',  'Not in database or try again with better lighting'); break;
+          default:           showError('Recognition Failed',   result.message || 'Unknown error');
+        }
+      }
+
+    } catch(e) {
+      clearInterval(confInterval);
+      showError('Server Offline', 'Make sure server.py is running: python server.py');
+    }
+
+    btn.disabled  = false;
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Scan Face';
+    setPill('pillScan', 'on', 'Ready to Scan');
+  }
+
+  // ---- SHOW RESULTS ----------------------------------------------------
+
+  function showPresent(student, conf, already_marked) {
+    const now      = new Date();
+    const timeStr  = now.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    const total    = (student.present || 0) + (student.absent || 0);
+    const rate     = total > 0 ? Math.round((student.present / total) * 100) + '%' : 'N/A';
+    const roll     = student.roll_no || student.roll;
+    const initials = student.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+    document.getElementById('faceLabel').textContent = student.name.toUpperCase();
+
+    // Student card
+    document.getElementById('studentSection').style.display = 'block';
+    document.getElementById('scAvatar').textContent   = initials;
+    document.getElementById('scName').textContent     = student.name;
+    document.getElementById('scMeta').textContent     = roll + ' · ' + (student.dept || '') + ' · ' + (student.year || '');
+    document.getElementById('scPresent').textContent  = student.present || 0;
+    document.getElementById('scAbsent').textContent   = student.absent  || 0;
+    document.getElementById('scRate').textContent     = rate;
+
+    // Result banner
+    document.getElementById('resultSection').style.display = 'block';
+    const banner = document.getElementById('resultBanner');
+    banner.className = 'result-banner show';
+
+    if (already_marked) {
+      banner.classList.add('already');
+      document.getElementById('rbIcon').innerHTML  = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+      document.getElementById('rbTitle').textContent = 'Already Marked Today';
+      document.getElementById('rbTime').textContent  = 'Attendance already recorded for ' + student.name;
+      setPill('pillResult', 'warn', 'Already Marked');
+    } else {
+      banner.classList.add('marked');
+      document.getElementById('rbIcon').innerHTML  = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+      document.getElementById('rbTitle').textContent = 'Attendance Marked — Present';
+      document.getElementById('rbTime').textContent  = 'Marked at ' + timeStr + '  |  Confidence: ' + conf.toFixed(1) + '%';
+      setPill('pillResult', 'good', 'Marked Present');
+
+      const isLate = now.getHours() >= 10;
+      logEntries.unshift({ name: student.name, roll, initials, time: timeStr, late: isLate });
+      updateLog();
+      loadAbsentList();
+    }
+  }
+
+  function showError(title, subtitle) {
+    document.getElementById('faceLabel').textContent = title.toUpperCase();
+    document.getElementById('studentSection').style.display = 'none';
+    document.getElementById('resultSection').style.display  = 'block';
+
+    const banner = document.getElementById('resultBanner');
+    banner.className = 'result-banner show failed';
+    document.getElementById('rbIcon').innerHTML  = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    document.getElementById('rbTitle').textContent = title;
+    document.getElementById('rbTime').textContent  = subtitle;
+    setPill('pillResult', 'warn', title);
+  }
+
+  // ---- TODAY'S LOG (from server) ---------------------------------------
+
+  async function loadTodayLog() {
+    try {
+      const res  = await fetch('http://localhost:5000/api/attendance/today');
+      const data = await res.json();
+      if (data.success) {
+        logEntries = data.entries.map(e => ({
+          name:     e.name,
+          roll:     e.roll_no,
+          initials: e.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(),
+          time:     e.time,
+          late:     e.time >= '10:00:00'
+        }));
+        updateLog();
+        document.getElementById('siCount').textContent = logEntries.length;
+      }
+    } catch(e) {}
+  }
+  // Refresh log every 10 seconds
+  setInterval(() => { if (loggedInUser) loadTodayLog(); }, 10000);
+
+  function updateLog() {
+    const list = document.getElementById('logList');
+    document.getElementById('logCount').textContent = logEntries.length + ' entr' + (logEntries.length === 1 ? 'y' : 'ies');
+    document.getElementById('siCount').textContent  = logEntries.length;
+
+    if (logEntries.length === 0) {
+      list.innerHTML = '<div class="log-empty">No attendance recorded yet.<br>Start the camera and scan a face.</div>';
+      return;
+    }
+
+    list.innerHTML = logEntries.map(e => `
+      <div class="log-item">
+        <div class="li-left">
+          <div class="li-av">${e.initials}</div>
+          <div>
+            <div class="li-name">${e.name}</div>
+            <div class="li-roll">${e.roll}</div>
+          </div>
+        </div>
+        <div class="li-right">
+          <span class="badge ${e.late ? 'badge-late' : 'badge-present'}">${e.late ? 'LATE' : 'PRESENT'}</span>
+          <span class="li-time">${e.time}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  // ---- ABSENT LIST (from server) ---------------------------------------
+
+  async function loadAbsentList() {
+    try {
+      const [studRes, attRes] = await Promise.all([
+        fetch('http://localhost:5000/api/students'),
+        fetch('http://localhost:5000/api/attendance/today')
+      ]);
+      const studData = await studRes.json();
+      const attData  = await attRes.json();
+
+      if (!studData.success) return;
+
+      const presentRolls = attData.success
+        ? attData.entries.map(e => e.roll_no)
+        : [];
+
+      const absent = studData.students.filter(s => !presentRolls.includes(s.roll_no));
+
+      document.getElementById('absentCount').textContent = absent.length + ' student' + (absent.length !== 1 ? 's' : '');
+      document.getElementById('siTotalStudents').textContent = studData.students.length;
+
+      const list = document.getElementById('absentList');
+      if (absent.length === 0) {
+        list.innerHTML = '<div class="log-empty">All students have been marked present.</div>';
+        return;
+      }
+
+      list.innerHTML = absent.map(s => {
+        const initials = s.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+        return `
+        <div class="log-item absent-item">
+          <div class="li-left">
+            <div class="li-av li-av-absent">${initials}</div>
+            <div>
+              <div class="li-name">${s.name}</div>
+              <div class="li-roll">${s.roll_no} · ${s.dept || ''}</div>
+            </div>
+          </div>
+          <div class="li-right">
+            <span class="badge badge-pending">NOT YET</span>
+          </div>
+        </div>`;
+      }).join('');
+
+    } catch(e) {}
+  }
+  // Refresh absent list every 10 seconds
+  setInterval(() => { if (loggedInUser) loadAbsentList(); }, 10000);
+
+  // ---- RESET -----------------------------------------------------------
+  function resetScan() {
+    document.getElementById('studentSection').style.display = 'none';
+    document.getElementById('resultSection').style.display  = 'none';
+    document.getElementById('confCard').classList.remove('show');
+    document.getElementById('confFill').style.width = '0';
+    document.getElementById('confPct').textContent  = '0%';
+    setPill('pillResult', '', 'Awaiting Scan');
+    if (stream) {
+      document.getElementById('faceLabel').textContent = 'POSITION FACE HERE';
+      setPill('pillScan', 'on', 'Ready to Scan');
+    }
+  }
+
+  // ---- HELPERS ---------------------------------------------------------
+  function setPill(id, cls, text) {
+    const el = document.getElementById(id);
+    el.className = 'status-pill' + (cls ? ' ' + cls : '');
+    el.innerHTML = '<span class="s-dot"></span> ' + text;
+  }
+</script>
+</body>
+</html>

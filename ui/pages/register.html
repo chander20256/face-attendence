@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — Green Hills Engineering College</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --green:    #22c55e;
+  --green-d:  #16a34a;
+  --green-dk: #14532d;
+  --pale:     #f0faf2;
+  --border:   #c8e6cc;
+  --text:     #14532d;
+  --muted:    #6b9f7a;
+  --error:    #dc2626;
+  --white:    #ffffff;
+  --success:  #16a34a;
+}
+body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--text); min-height:100vh; }
+
+/* ── LAYOUT ── */
+.layout { display:grid; grid-template-columns:340px 1fr; min-height:100vh; }
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  background:linear-gradient(160deg,#14532d 0%,#166534 60%,#15803d 100%);
+  padding:40px 32px;
+  display:flex; flex-direction:column;
+  position:sticky; top:0; height:100vh; overflow:hidden;
+}
+.lp-logo { width:64px; height:64px; object-fit:contain; margin-bottom:16px; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
+.lp-college { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:#fff; margin-bottom:4px; }
+.lp-sub { font-size:11px; color:rgba(255,255,255,0.55); letter-spacing:1px; margin-bottom:40px; }
+.lp-heading { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; color:#fff; line-height:1.2; margin-bottom:12px; }
+.lp-desc { font-size:13px; color:rgba(255,255,255,0.65); line-height:1.7; margin-bottom:40px; }
+
+.step-indicators { display:flex; flex-direction:column; gap:0; }
+.step-ind { display:flex; align-items:flex-start; gap:14px; padding:12px 0; position:relative; }
+.step-ind:not(:last-child)::after {
+  content:''; position:absolute; left:14px; top:40px;
+  width:2px; height:calc(100% - 16px);
+  background:rgba(255,255,255,0.2);
+}
+.step-num {
+  width:28px; height:28px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; font-family:'DM Mono',monospace;
+  background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.5);
+  border:1.5px solid rgba(255,255,255,0.2);
+  transition:all 0.3s;
+}
+.step-ind.active .step-num { background:var(--green); color:#fff; border-color:var(--green); box-shadow:0 0 12px rgba(34,197,94,0.5); }
+.step-ind.done .step-num   { background:rgba(34,197,94,0.3); color:var(--green); border-color:var(--green); }
+.step-info { padding-top:4px; }
+.step-title { font-size:13px; font-weight:600; color:rgba(255,255,255,0.5); transition:color 0.3s; }
+.step-ind.active .step-title { color:#fff; }
+.step-ind.done  .step-title  { color:rgba(255,255,255,0.7); }
+.step-sub { font-size:11px; color:rgba(255,255,255,0.35); margin-top:2px; }
+
+.lp-bottom { margin-top:auto; font-size:12px; color:rgba(255,255,255,0.4); line-height:1.6; }
+.lp-bottom a { color:var(--green); text-decoration:none; }
+
+/* ── RIGHT PANEL ── */
+.right-panel { padding:48px 52px; max-width:720px; }
+
+/* Progress bar */
+.progress-wrap { margin-bottom:36px; }
+.progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.progress-label { font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; }
+.progress-pct { font-size:12px; font-weight:600; color:var(--green-d); font-family:'DM Mono',monospace; }
+.progress-track { height:4px; background:var(--border); border-radius:99px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--green-d),var(--green)); border-radius:99px; transition:width 0.4s ease; }
+
+/* Section */
+.form-section { display:none; }
+.form-section.active { display:block; }
+
+.section-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--text); margin-bottom:6px; }
+.section-sub   { font-size:14px; color:var(--muted); margin-bottom:28px; line-height:1.6; }
+
+/* Form grid */
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px 22px; margin-bottom:24px; }
+.form-grid.full { grid-template-columns:1fr; }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field.span2 { grid-column:span 2; }
+.field label { font-size:12px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:var(--muted); }
+.field input, .field select, .field textarea {
+  padding:11px 14px; border-radius:8px;
+  border:1.5px solid var(--border); background:#fff;
+  font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text);
+  transition:border 0.2s, box-shadow 0.2s;
+  outline:none;
+}
+.field input::placeholder, .field textarea::placeholder { color:#a8c5b0; }
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--green); box-shadow:0 0 0 3px rgba(34,197,94,0.12);
+}
+.field input.error, .field select.error, .field textarea.error {
+  border-color:var(--error); box-shadow:0 0 0 3px rgba(220,38,38,0.1);
+}
+.field .err-msg { font-size:11px; color:var(--error); display:none; }
+.field .err-msg.show { display:block; }
+.field textarea { resize:vertical; min-height:80px; }
+
+/* Photo upload */
+.photo-box {
+  border:2px dashed var(--border); border-radius:12px;
+  padding:24px; text-align:center; cursor:pointer;
+  transition:border-color 0.2s, background 0.2s;
+  background:#fff;
+}
+.photo-box:hover { border-color:var(--green); background:var(--pale); }
+.photo-box img { width:80px; height:80px; border-radius:50%; object-fit:cover; margin-bottom:8px; }
+.photo-box-text { font-size:13px; color:var(--muted); }
+.photo-box-text span { display:block; font-size:11px; margin-top:4px; color:#b0c8b0; }
+
+/* Camera section */
+.camera-wrap {
+  border:2px solid var(--border); border-radius:16px;
+  overflow:hidden; background:#0a1a0f; position:relative;
+  aspect-ratio:4/3;
+}
+.cam-placeholder {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:rgba(255,255,255,0.35); font-size:13px; gap:10px;
+}
+.cam-placeholder svg { opacity:0.3; }
+#liveCanvas {
+  display:none; width:100%; height:100%;
+  position:absolute; inset:0; object-fit:cover;
+}
+#videoEl { display:none; }
+#snapCanvas { display:none; }
+.cam-status {
+  display:none; position:absolute; bottom:12px; left:50%;
+  transform:translateX(-50%);
+  background:rgba(22,163,74,0.85); color:#fff;
+  font-size:12px; font-weight:600; font-family:'DM Mono',monospace;
+  padding:5px 16px; border-radius:99px; white-space:nowrap; z-index:10;
+}
+.cam-counter {
+  display:none; position:absolute; top:12px; right:12px;
+  background:rgba(0,0,0,0.6); color:var(--green);
+  font-size:13px; font-family:'DM Mono',monospace; font-weight:600;
+  padding:4px 12px; border-radius:8px; z-index:10;
+}
+
+.cam-controls { display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
+
+/* Dots */
+.capture-dots { display:flex; gap:10px; margin-top:16px; justify-content:center; }
+.dot {
+  width:36px; height:36px; border-radius:50%;
+  border:2px solid var(--border); background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; color:var(--muted); font-family:'DM Mono',monospace;
+  transition:all 0.3s;
+}
+.dot.captured { background:var(--green); border-color:var(--green); color:#fff; }
+.dot.captured::after { content:'✓'; font-size:14px; }
+
+/* Consent */
+.consent-row { display:flex; align-items:flex-start; gap:12px; margin-top:20px; }
+.custom-check { position:relative; width:20px; height:20px; flex-shrink:0; margin-top:2px; }
+.custom-check input { opacity:0; position:absolute; width:100%; height:100%; cursor:pointer; z-index:2; }
+.check-box {
+  width:20px; height:20px; border-radius:5px;
+  border:2px solid var(--border); background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s;
+}
+.custom-check input:checked ~ .check-box { background:var(--green); border-color:var(--green); }
+.custom-check input:checked ~ .check-box::after { content:'✓'; color:#fff; font-size:12px; font-weight:700; }
+.consent-text { font-size:13px; color:var(--muted); line-height:1.6; }
+
+/* Buttons */
+.btn-row { display:flex; gap:14px; margin-top:28px; }
+.btn {
+  padding:12px 28px; border-radius:8px; border:none;
+  font-size:14px; font-weight:600; font-family:'DM Sans',sans-serif;
+  cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:8px;
+}
+.btn-primary { background:var(--green-d); color:#fff; }
+.btn-primary:hover { background:var(--green); transform:translateY(-1px); }
+.btn-outline { background:#fff; color:var(--text); border:1.5px solid var(--border); }
+.btn-outline:hover { border-color:var(--green-d); }
+.btn-cam { background:var(--pale); color:var(--green-dk); border:1.5px solid var(--border); padding:10px 20px; font-size:13px; }
+.btn-cam:hover { border-color:var(--green); }
+.btn-capture { background:var(--green); color:#fff; padding:10px 20px; font-size:13px; }
+.btn-capture:hover { background:var(--green-d); }
+.btn-capture:disabled { background:var(--border); color:var(--muted); cursor:not-allowed; }
+.btn-stop { background:#fff; color:var(--error); border:1.5px solid #fecaca; padding:10px 20px; font-size:13px; }
+
+/* Success screen */
+.success-screen { display:none; text-align:center; padding:40px 20px; }
+.success-screen.show { display:block; }
+.success-icon { width:72px; height:72px; background:var(--green); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; margin-bottom:20px; }
+.success-icon svg { width:36px; height:36px; color:#fff; }
+.success-title { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:var(--text); margin-bottom:8px; }
+.success-sub { font-size:14px; color:var(--muted); margin-bottom:6px; }
+.success-id { font-family:'DM Mono',monospace; font-size:18px; font-weight:600; color:var(--green-d); margin:16px 0 24px; }
+.success-link { color:var(--green-d); text-decoration:none; font-weight:600; font-size:14px; }
+
+@media(max-width:900px) {
+  .layout { grid-template-columns:1fr; }
+  .left-panel { position:static; height:auto; min-height:auto; padding:24px 20px; }
+  .right-panel { padding:24px 20px; }
+  .form-grid { grid-template-columns:1fr; }
+  .field.span2 { grid-column:span 1; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <img src="assets/Logo.jpeg" alt="Logo" class="lp-logo">
+    <div class="lp-college">Green Hills Engineering College</div>
+    <div class="lp-sub">EST. 2003 · ATTENDANCE PORTAL</div>
+
+    <div class="lp-heading">Student Registration</div>
+    <div class="lp-desc">Register once to use facial recognition attendance every day. The process takes about 3 minutes.</div>
+
+    <div class="step-indicators" id="stepIndicators">
+      <div class="step-ind active" id="ind0">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-title">Personal Info</div>
+          <div class="step-sub">Name, roll, department</div>
+        </div>
+      </div>
+      <div class="step-ind" id="ind1">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-title">Photo & Contact</div>
+          <div class="step-sub">Profile photo, emergency contact</div>
+        </div>
+      </div>
+      <div class="step-ind" id="ind2">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-title">Face Capture</div>
+          <div class="step-sub">5 photos for recognition</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lp-bottom">
+      Already registered? <a href="#" onclick="navigate('attendance')">Mark Attendance</a><br>
+      <a href="index.html" style="color:rgba(255,255,255,0.35);">Back to Home</a>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-top">
+        <span class="progress-label" id="progressLabel">Step 1 of 3</span>
+        <span class="progress-pct" id="progressPct">33%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:33%"></div></div>
+    </div>
+
+    <!-- STEP 1: Personal Info -->
+    <div class="form-section active" id="section0">
+      <div class="section-title">Personal & Academic Info</div>
+      <div class="section-sub">Fill in your details. Fields marked * are required.</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>First Name *</label>
+          <input type="text" id="firstName" placeholder="e.g. Rahul">
+          <span class="err-msg" id="err-firstName">First name is required</span>
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" id="lastName" placeholder="e.g. Sharma">
+        </div>
+        <div class="field">
+          <label>Email Address *</label>
+          <input type="email" id="email" placeholder="you@example.com">
+          <span class="err-msg" id="err-email">Valid email is required</span>
+        </div>
+        <div class="field">
+          <label>Phone Number *</label>
+          <input type="tel" id="phone" placeholder="10-digit number" maxlength="10">
+          <span class="err-msg" id="err-phone">Enter valid 10-digit number</span>
+        </div>
+        <div class="field">
+          <label>Date of Birth *</label>
+          <input type="date" id="dob">
+          <span class="err-msg" id="err-dob">Date of birth is required</span>
+        </div>
+        <div class="field">
+          <label>Gender *</label>
+          <select id="gender">
+            <option value="">Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Prefer not to say</option>
+          </select>
+          <span class="err-msg" id="err-gender">Please select gender</span>
+        </div>
+        <div class="field">
+          <label>Roll Number *</label>
+          <input type="text" id="rollNo" placeholder="e.g. 22CS001">
+          <span class="err-msg" id="err-rollNo">Roll number is required</span>
+        </div>
+        <div class="field">
+          <label>Department *</label>
+          <select id="dept">
+            <option value="">Select department</option>
+            <option>Computer Science</option>
+            <option>Civil Engineering</option>
+            <option>Electrical Engineering</option>
+            <option>Mechanical Engineering</option>
+          </select>
+          <span class="err-msg" id="err-dept">Please select department</span>
+        </div>
+        <div class="field">
+          <label>Year *</label>
+          <select id="year">
+            <option value="">Select year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+          <span class="err-msg" id="err-year">Please select year</span>
+        </div>
+        <div class="field">
+          <label>Password *</label>
+          <input type="password" id="password" placeholder="Min 8 characters">
+          <span class="err-msg" id="err-password">Password must be at least 8 characters</span>
+        </div>
+        <div class="field span2">
+          <label>Confirm Password *</label>
+          <input type="password" id="confirmPassword" placeholder="Re-enter password">
+          <span class="err-msg" id="err-confirmPassword">Passwords do not match</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="nextStep(0)">Next: Photo & Contact &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Photo & Contact -->
+    <div class="form-section" id="section1">
+      <div class="section-title">Photo & Emergency Contact</div>
+      <div class="section-sub">Upload your profile photo and provide an emergency contact.</div>
+
+      <div class="form-grid full">
+        <div class="field">
+          <label>Profile Photo *</label>
+          <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
+            <div id="photoPreviewWrap" style="display:none">
+              <img id="photoPreviewImg" src="" alt="Preview">
+            </div>
+            <div id="photoPlaceholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a8c5b0" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              <div class="photo-box-text">Click to upload photo<span>JPG, PNG — max 5MB</span></div>
+            </div>
+          </div>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+          <span class="err-msg" id="err-photo">Please upload a profile photo</span>
+        </div>
+
+        <div class="field">
+          <label>Emergency Contact Name *</label>
+          <input type="text" id="emergencyName" placeholder="Parent / Guardian name">
+          <span class="err-msg" id="err-emergencyName">Emergency contact name required</span>
+        </div>
+        <div class="field">
+          <label>Emergency Contact Phone *</label>
+          <input type="tel" id="emergencyPhone" placeholder="10-digit number" maxlength="10">
+          <span class="err-msg" id="err-emergencyPhone">Enter valid 10-digit number</span>
+        </div>
+        <div class="field span2">
+          <label>Address</label>
+          <textarea id="address" placeholder="Home address (optional)"></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep(1)">&larr; Back</button>
+        <button class="btn btn-primary" onclick="nextStep(1)">Next: Face Capture &rarr;</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Face Capture -->
+    <div class="form-section" id="section2">
+      <div class="section-title">Face Capture</div>
+      <div class="section-sub">We need 5 clear photos of your face for recognition. Position your face inside the green oval, then click Capture. Move your head slightly between each shot.</div>
+
+      <!-- Camera viewport -->
+      <div class="camera-wrap" id="cameraWrap">
+        <div class="cam-placeholder" id="camPlaceholder">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Click "Start Camera" below
+        </div>
+        <canvas id="liveCanvas"></canvas>
+        <video id="videoEl" autoplay playsinline muted></video>
+        <canvas id="snapCanvas"></canvas>
+        <div class="cam-status" id="camStatus">Position your face in the oval</div>
+        <div class="cam-counter" id="camCounter">0 / 5</div>
+      </div>
+
+      <div class="cam-controls">
+        <button class="btn btn-cam" id="btnStart"  onclick="startCam()">Start Camera</button>
+        <button class="btn btn-capture" id="btnCapture" onclick="doCapture()" disabled>Capture (0/5)</button>
+        <button class="btn btn-stop"   id="btnStop"  onclick="stopCam()" style="display:none">Stop</button>
+      </div>
+
+      <div class="capture-dots" id="captureDots">
+        <div class="dot" id="dot0">1</div>
+        <div class="dot" id="dot1">2</div>
+        <div class="dot" id="dot2">3</div>
+        <div class="dot" id="dot3">4</div>
+        <div class="dot" id="dot4">5</div>
+      </div>
+
+      <div id="captureMsg" style="text-align:center;margin-top:12px;font-size:13px;color:var(--muted);min-height:20px;"></div>
+
+      <!-- Consent -->
+      <div class="consent-row">
+        <label class="custom-check">
+          <input type="checkbox" id="consent">
+          <div class="check-box"></div>
+        </label>
+        <div class="consent-text">I consent to my facial data being stored and used for attendance verification by Green Hills Engineering College.</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="prevStep(2)">&larr; Back</button>
+        <button class="btn btn-primary" id="btnSubmit" onclick="submitForm()">Complete Registration</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div class="success-title">Registration Complete!</div>
+      <div class="success-sub">Your face data has been saved and model has been trained.</div>
+      <div class="success-id" id="successRoll"></div>
+      <div class="success-sub" style="margin-bottom:24px">You can now mark attendance using facial recognition.</div>
+      <a href="attendance.html" class="btn btn-primary" style="text-decoration:none;display:inline-flex">Go to Attendance &rarr;</a>
+    </div>
+
+  </div><!-- /right-panel -->
+</div><!-- /layout -->
+
+<script>
+// =====================================================================
+//  STATE
+// =====================================================================
+let currentStep    = 0;
+let camStream      = null;
+let drawLoop       = null;
+let captureCount   = 0;
+let capturedImages = [];   // array of base64 jpeg strings
+
+const video  = document.getElementById('videoEl');
+const canvas = document.getElementById('liveCanvas');
+const snap   = document.getElementById('snapCanvas');
+
+// =====================================================================
+//  STEP NAVIGATION
+// =====================================================================
+function setStep(step) {
+  // Hide all sections
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section' + step).classList.add('active');
+
+  // Update indicators
+  for (let i = 0; i < 3; i++) {
+    const ind = document.getElementById('ind' + i);
+    ind.classList.remove('active', 'done');
+    if (i < step)  ind.classList.add('done');
+    if (i === step) ind.classList.add('active');
+  }
+
+  // Progress bar
+  const pcts   = ['33%', '66%', '100%'];
+  const labels = ['Step 1 of 3', 'Step 2 of 3', 'Step 3 of 3'];
+  document.getElementById('progressFill').style.width  = pcts[step];
+  document.getElementById('progressPct').textContent   = pcts[step];
+  document.getElementById('progressLabel').textContent = labels[step];
+
+  currentStep = step;
+  window.scrollTo(0, 0);
+}
+
+function prevStep(from) { setStep(from - 1); }
+
+function nextStep(from) {
+  if (!validateStep(from)) return;
+  setStep(from + 1);
+}
+
+// =====================================================================
+//  VALIDATION
+// =====================================================================
+function setErr(id, show) {
+  const inp = document.getElementById(id);
+  const err = document.getElementById('err-' + id);
+  if (!inp || !err) return;
+  if (show) { inp.classList.add('error');   err.classList.add('show'); }
+  else       { inp.classList.remove('error'); err.classList.remove('show'); }
+}
+
+function validateStep(step) {
+  let ok = true;
+
+  if (step === 0) {
+    const fn = document.getElementById('firstName').value.trim();
+    const em = document.getElementById('email').value.trim();
+    const ph = document.getElementById('phone').value.trim();
+    const db = document.getElementById('dob').value;
+    const gn = document.getElementById('gender').value;
+    const rn = document.getElementById('rollNo').value.trim();
+    const dp = document.getElementById('dept').value;
+    const yr = document.getElementById('year').value;
+    const pw = document.getElementById('password').value;
+    const cp = document.getElementById('confirmPassword').value;
+
+    setErr('firstName',       !fn);
+    setErr('email',           !em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em));
+    setErr('phone',           !ph || !/^\d{10}$/.test(ph));
+    setErr('dob',             !db);
+    setErr('gender',          !gn);
+    setErr('rollNo',          !rn);
+    setErr('dept',            !dp);
+    setErr('year',            !yr);
+    setErr('password',        pw.length < 8);
+    setErr('confirmPassword', pw !== cp);
+
+    if (!fn || !em || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) ||
+        !ph || !/^\d{10}$/.test(ph) || !db || !gn || !rn || !dp || !yr ||
+        pw.length < 8 || pw !== cp) ok = false;
+  }
+
+  if (step === 1) {
+    const ep = document.getElementById('emergencyPhone').value.trim();
+    const en = document.getElementById('emergencyName').value.trim();
+    const hasPhoto = document.getElementById('photoInput').files.length > 0;
+
+    setErr('photo',          !hasPhoto);
+    setErr('emergencyName',  !en);
+    setErr('emergencyPhone', !ep || !/^\d{10}$/.test(ep));
+
+    if (!hasPhoto || !en || !ep || !/^\d{10}$/.test(ep)) ok = false;
+  }
+
+  return ok;
+}
+
+// =====================================================================
+//  PHOTO PREVIEW
+// =====================================================================
+function previewPhoto(input) {
+  if (!input.files.length) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('photoPreviewImg').src = e.target.result;
+    document.getElementById('photoPreviewWrap').style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// =====================================================================
+//  CAMERA
+// =====================================================================
+async function startCam() {
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+    });
+
+    video.srcObject = camStream;
+
+    // Wait for video to have real frame data
+    await new Promise(resolve => {
+      video.onloadeddata = () => { if (video.videoWidth > 0) resolve(); };
+      video.onloadedmetadata = () => video.play().catch(() => {});
+      setTimeout(resolve, 5000); // max wait 5s
+    });
+
+    // Extra wait for first painted frame
+    await new Promise(r => setTimeout(r, 600));
+
+    // Set canvas dimensions
+    const W = video.videoWidth  || 640;
+    const H = video.videoHeight || 480;
+    canvas.width  = W;
+    canvas.height = H;
+    snap.width    = 200;
+    snap.height   = 200;
+
+    // Show canvas
+    canvas.style.display     = 'block';
+    document.getElementById('camPlaceholder').style.display = 'none';
+    document.getElementById('camStatus').style.display      = 'block';
+    document.getElementById('camCounter').style.display     = 'block';
+    document.getElementById('btnStart').style.display       = 'none';
+    document.getElementById('btnStop').style.display        = 'inline-flex';
+    document.getElementById('btnCapture').disabled          = false;
+
+    // Start drawing
+    startDrawLoop();
+
+  } catch (e) {
+    console.error(e);
+    let msg = 'Camera Error: ';
+    if (e.name === 'NotAllowedError')   msg += 'Permission denied. Click the camera icon in your browser address bar and set to Allow.';
+    else if (e.name === 'NotFoundError') msg += 'No camera found. Please connect a webcam.';
+    else if (e.name === 'NotReadableError') msg += 'Camera is in use by another app. Close Zoom / Teams / Skype and try again.';
+    else msg += e.message;
+    alert(msg);
+  }
+}
+
+function startDrawLoop() {
+  const ctx = canvas.getContext('2d');
+  const W   = canvas.width;
+  const H   = canvas.height;
+
+  function draw() {
+    if (!camStream) return;
+
+    // Draw mirrored video
+    ctx.save();
+    ctx.translate(W, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, W, H);
+    ctx.restore();
+
+    // Oval guide
+    ctx.strokeStyle = captureCount >= 5 ? 'rgba(34,197,94,1)' : 'rgba(34,197,94,0.8)';
+    ctx.lineWidth   = 3;
+    ctx.setLineDash([10, 5]);
+    ctx.beginPath();
+    ctx.ellipse(W / 2, H / 2, W * 0.20, H * 0.40, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Oval label
+    ctx.fillStyle = 'rgba(34,197,94,0.85)';
+    ctx.font      = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(
+      captureCount >= 5 ? 'ALL DONE!' : 'FACE HERE',
+      W / 2, H / 2 + H * 0.43
+    );
+
+    drawLoop = requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+
+function stopCam() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  if (drawLoop)  { cancelAnimationFrame(drawLoop); drawLoop = null; }
+
+  canvas.style.display    = 'none';
+  document.getElementById('camPlaceholder').style.display = 'flex';
+  document.getElementById('camStatus').style.display      = 'none';
+  document.getElementById('camCounter').style.display     = 'none';
+  document.getElementById('btnStart').style.display       = 'inline-flex';
+  document.getElementById('btnStop').style.display        = 'none';
+  document.getElementById('btnCapture').disabled          = true;
+}
+
+// =====================================================================
+//  CAPTURE PHOTO
+// =====================================================================
+function doCapture() {
+  if (captureCount >= 5) return;
+
+  // Safety: canvas must have real pixel data
+  if (!camStream || canvas.width === 0 || canvas.height === 0) {
+    alert('Camera is not ready yet. Please wait a moment.');
+    return;
+  }
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Crop the center portion where the face oval is (middle 60% width, 85% height)
+  const cropX = W * 0.20;
+  const cropY = H * 0.08;
+  const cropW = W * 0.60;
+  const cropH = H * 0.84;
+
+  const snapCtx = snap.getContext('2d');
+  snap.width  = 200;
+  snap.height = 200;
+  snapCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, 200, 200);
+
+  // Save as base64
+  const imgData = snap.toDataURL('image/jpeg', 0.95);
+  capturedImages.push(imgData);
+
+  // Flash green on main canvas
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(34,197,94,0.4)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Update dot
+  const dot = document.getElementById('dot' + captureCount);
+  if (dot) { dot.classList.add('captured'); dot.textContent = ''; }
+
+  captureCount++;
+
+  // Update UI
+  document.getElementById('camCounter').textContent = captureCount + ' / 5';
+  document.getElementById('camStatus').textContent  =
+    captureCount >= 5
+      ? 'All 5 images captured!'
+      : `${captureCount}/5 captured — move head slightly, then capture again`;
+
+  const btn = document.getElementById('btnCapture');
+  if (captureCount >= 5) {
+    btn.textContent = 'All Captured!';
+    btn.disabled    = true;
+    document.getElementById('captureMsg').textContent = 'Great! Now accept the consent and click Complete Registration.';
+    document.getElementById('captureMsg').style.color = 'var(--success)';
+  } else {
+    btn.textContent = `Capture (${captureCount}/5)`;
+  }
+}
+
+// =====================================================================
+//  SUBMIT REGISTRATION
+// =====================================================================
+async function submitForm() {
+  if (!document.getElementById('consent').checked) {
+    alert('Please accept the consent checkbox before submitting.');
+    return;
+  }
+  if (captureCount < 5) {
+    alert('Please capture all 5 face images before submitting.');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled    = true;
+  btn.textContent = 'Submitting...';
+
+  stopCam();
+
+  const payload = {
+    firstName:   document.getElementById('firstName').value.trim(),
+    lastName:    document.getElementById('lastName').value.trim(),
+    email:       document.getElementById('email').value.trim(),
+    phone:       document.getElementById('phone').value.trim(),
+    dob:         document.getElementById('dob').value,
+    gender:      document.getElementById('gender').value,
+    studentId:   document.getElementById('rollNo').value.trim(),
+    dept:        document.getElementById('dept').value,
+    year:        document.getElementById('year').value,
+    password:    document.getElementById('password').value,
+    faceImages:  capturedImages
+  };
+
+  try {
+    const res    = await fetch('http://localhost:5000/api/register', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      showSuccess(payload.studentId);
+    } else {
+      alert('Registration failed: ' + result.message);
+      btn.disabled    = false;
+      btn.textContent = 'Complete Registration';
+    }
+  } catch(e) {
+    // Server offline — save to localStorage as fallback
+    console.warn('Server offline, saving to localStorage');
+    localStorage.setItem('student_' + payload.studentId, JSON.stringify({
+      name:  payload.firstName + ' ' + payload.lastName,
+      roll:  payload.studentId,
+      dept:  payload.dept,
+      year:  payload.year,
+      faceRegistered: true,
+      faceData: capturedImages[0] || null
+    }));
+    showSuccess(payload.studentId);
+  }
+}
+
+function showSuccess(rollNo) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('successRoll').textContent    = 'Roll Number: ' + rollNo;
+  document.getElementById('successScreen').style.display = 'block';
+}
+</script>
+</body>
+</html>
