@@ -1,348 +1,508 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FaceAttend — Attendance System</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --green-dark:  #14532d;
-    --green-mid:   #16a34a;
-    --green-light: #22c55e;
-    --green-pale:  #dcfce7;
-    --white:       #ffffff;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page - Face Recognition Attendance System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --green-dark:  #14532d;
+      --green-mid:   #16a34a;
+      --green-light: #22c55e;
+      --green-pale:  #dcfce7;
+      --white:       #ffffff;
+      --gray-light:  #f3f4f6;
+      --gray-dark:   #374151;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    height: 100%;
-    font-family: 'DM Sans', sans-serif;
-    overflow-y: auto;
-  }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      overflow-y: auto;
+    }
 
-  /* ========================
-     STATIC BACKGROUND IMAGE
-  ======================== */
-  .bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background-image: url('assets/Backgroundimg.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+    /* Static background image */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url('../assets/Backgroundimg.jpeg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
 
-  /* Dark overlay for text readability */
-  .overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(
-      to bottom,
-      rgba(5, 30, 12, 0.50) 0%,
-      rgba(5, 25, 10, 0.38) 40%,
-      rgba(5, 30, 12, 0.68) 100%
-    );
-  }
+    /* Dark overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        to bottom,
+        rgba(5, 30, 12, 0.50) 0%,
+        rgba(5, 25, 10, 0.38) 40%,
+        rgba(5, 30, 12, 0.68) 100%
+      );
+    }
 
-  /* ========================
-     MAIN CONTENT
-  ======================== */
-  .page {
-    position: relative;
-    z-index: 10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px 90px 20px;
-    text-align: center;
-  }
+    /* Main content */
+    .page {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 90px 20px;
+      text-align: center;
+    }
 
-  /* College logo */
-  .college-logo {
-    width: 110px;
-    height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 22px;
-    animation: logoReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
-    flex-shrink: 0;
-  }
+    /* Features Section */
+    .features-section {
+      width: 100%;
+      max-width: 1400px;
+      margin-top: 80px;
+      padding: 60px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      animation: fadeUp 0.7s 1s ease both;
+    }
 
-  .college-logo img {
-    width: 110px;
-    height: 110px;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
-  }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+      text-align: center;
+    }
 
-  @keyframes logoReveal {
-    from { transform: scale(0.5) translateY(-20px); opacity: 0; }
-    to   { transform: scale(1) translateY(0); opacity: 1; }
-  }
+    .section-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 50px auto;
+      line-height: 1.6;
+    }
 
-  /* College name */
-  .college-name {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #ffffff;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.8), 0 1px 4px rgba(0,0,0,0.9);
-    margin-bottom: 28px;
-    animation: fadeUp 0.7s 0.2s ease both;
-  }
+    .section-subtitle span {
+      color: var(--green-light);
+    }
 
-  /* Welcome line */
-  .welcome-line {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(14px, 2vw, 18px);
-    font-weight: 400;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    color: var(--green-light);
-    margin-bottom: 14px;
-    animation: fadeUp 0.7s 0.35s ease both;
-  }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      padding: 20px;
+    }
 
-  /* Main heading */
-  .main-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 6vw, 68px);
-    font-weight: 900;
-    color: #ffffff;
-    line-height: 1.1;
-    margin-bottom: 18px;
-    text-shadow: 0 4px 30px rgba(0,0,0,0.55);
-    animation: fadeUp 0.7s 0.45s ease both;
-  }
+    /* Feature Card Styles */
+    .feature-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
 
-  .main-heading span {
-    color: var(--green-light);
-    display: block;
-  }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
 
-  /* Tagline */
-  .tagline {
-    font-size: clamp(14px, 1.6vw, 17px);
-    font-weight: 300;
-    color: rgba(255,255,255,0.78);
-    max-width: 520px;
-    line-height: 1.75;
-    margin-bottom: 44px;
-    animation: fadeUp 0.7s 0.55s ease both;
-  }
+    .feature-card:hover::before {
+      left: 100%;
+    }
 
-  /* Buttons */
-  .btn-group {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
-    justify-content: center;
-    animation: fadeUp 0.7s 0.7s ease both;
-  }
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      border-color: var(--green-light);
+      box-shadow: 0 20px 40px rgba(34, 197, 94, 0.2);
+    }
 
-  .btn {
-    padding: 16px 44px;
-    border-radius: 5px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-    display: inline-block;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
-    position: relative;
-    overflow: hidden;
-  }
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      transition: all 0.3s ease;
+    }
 
-  .btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0);
-    transition: background 0.2s;
-  }
+    .feature-card:hover .feature-icon {
+      transform: rotateY(180deg);
+      background: linear-gradient(135deg, var(--green-light), var(--green-mid));
+    }
 
-  .btn:hover::after { background: rgba(255,255,255,0.1); }
-  .btn:hover        { transform: translateY(-3px); }
+    .feature-icon i {
+      font-size: 40px;
+      color: white;
+      transition: transform 0.3s ease;
+    }
 
-  .btn-primary {
-    background: var(--green-mid);
-    color: white;
-    box-shadow: 0 4px 24px rgba(22,163,74,0.55);
-    animation: glowPulse 3s ease-in-out infinite 1.5s;
-  }
+    .feature-card:hover .feature-icon i {
+      transform: scale(1.1);
+    }
 
-  @keyframes glowPulse {
-    0%, 100% { box-shadow: 0 4px 24px rgba(22,163,74,0.55); }
-    50%       { box-shadow: 0 4px 44px rgba(22,163,74,0.85); }
-  }
+    .feature-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 12px;
+      font-family: 'Playfair Display', serif;
+    }
 
-  .btn-primary:hover { box-shadow: 0 8px 40px rgba(22,163,74,0.75); }
+    .feature-description {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
 
-  .btn-outline {
-    background: transparent;
-    color: white;
-    border: 2px solid rgba(255,255,255,0.72);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  }
+    .feature-tag {
+      display: inline-block;
+      padding: 5px 12px;
+      background: rgba(34, 197, 94, 0.2);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green-light);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-  .btn-outline:hover {
-    border-color: white;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.32);
-  }
+    .feature-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-  /* Stats row */
-  .stats {
-    display: flex;
-    gap: 50px;
-    margin-top: 52px;
-    animation: fadeUp 0.7s 0.85s ease both;
-    padding-top: 34px;
-    border-top: 1px solid rgba(255,255,255,0.18);
-  }
+    .feature-stat {
+      text-align: center;
+    }
 
-  .stat { text-align: center; }
+    .feature-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--green-light);
+      font-family: 'DM Mono', monospace;
+    }
 
-  .stat-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 27px;
-    font-weight: 500;
-    color: var(--green-light);
-    display: block;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
+    .feature-stat-label {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-  .stat-label {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.52);
-  }
+    /* Animation for cards */
+    @keyframes cardGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.1); }
+      50% { box-shadow: 0 0 30px rgba(34, 197, 94, 0.3); }
+    }
 
-  .stat-divider {
-    width: 1px;
-    background: rgba(255,255,255,0.18);
-    align-self: stretch;
-  }
+    .feature-card {
+      animation: cardGlow 3s ease-in-out infinite;
+    }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+    .feature-card:nth-child(1) { animation-delay: 0s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.4s; }
+    .feature-card:nth-child(4) { animation-delay: 0.6s; }
+    .feature-card:nth-child(5) { animation-delay: 0.8s; }
+    .feature-card:nth-child(6) { animation-delay: 1s; }
 
-  /* Bottom nav bar */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    z-index: 20;
-    background: rgba(5, 25, 10, 0.65);
-    backdrop-filter: blur(16px);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding: 14px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+    .college-logo {
+      width: 110px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+      animation: logoReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
 
-  .bottom-links { display: flex; gap: 28px; }
+    .college-logo img {
+      width: 110px;
+      height: 110px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
+    }
 
-  .bottom-link {
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
+    @keyframes logoReveal {
+      from { transform: scale(0.5) translateY(-20px); opacity: 0; }
+      to   { transform: scale(1) translateY(0); opacity: 1; }
+    }
 
-  .bottom-link:hover { color: var(--green-light); }
+    .college-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+      margin-bottom: 28px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
 
-  .sys-status {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.45);
-    font-family: 'DM Mono', monospace;
-  }
+    .welcome-line {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(14px, 2vw, 18px);
+      font-weight: 400;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 14px;
+      animation: fadeUp 0.7s 0.35s ease both;
+    }
 
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green-light);
-    box-shadow: 0 0 8px var(--green-light);
-    animation: blink 1.5s ease-in-out infinite;
-  }
+    .main-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 6vw, 68px);
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.1;
+      margin-bottom: 18px;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.55);
+      animation: fadeUp 0.7s 0.45s ease both;
+    }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.3; }
-  }
+    .main-heading span {
+      color: var(--green-light);
+      display: block;
+    }
 
-  @media (max-width: 600px) {
-    .stats { gap: 24px; }
-    .btn { padding: 13px 26px; font-size: 13px; }
-    .bottom-nav { flex-direction: column; gap: 8px; padding: 12px 20px; }
-  }
-</style>
+    .tagline {
+      font-size: clamp(14px, 1.6vw, 17px);
+      font-weight: 300;
+      color: rgba(255,255,255,0.78);
+      max-width: 520px;
+      line-height: 1.75;
+      margin-bottom: 44px;
+      animation: fadeUp 0.7s 0.55s ease both;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.7s 0.7s ease both;
+    }
+
+    .btn {
+      padding: 16px 44px;
+      border-radius: 5px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: var(--green-mid);
+      color: white;
+      box-shadow: 0 4px 24px rgba(22,163,74,0.55);
+      animation: glowPulse 3s ease-in-out infinite 1.5s;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 4px 24px rgba(22,163,74,0.55); }
+      50%       { box-shadow: 0 4px 44px rgba(22,163,74,0.85); }
+    }
+
+    .btn-primary:hover { 
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px rgba(22,163,74,0.75);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.72);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .btn-outline:hover {
+      transform: translateY(-3px);
+      border-color: white;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+    }
+
+    .stats {
+      display: flex;
+      gap: 50px;
+      margin-top: 52px;
+      animation: fadeUp 0.7s 0.85s ease both;
+      padding-top: 34px;
+      border-top: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .stat { text-align: center; }
+
+    .stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 27px;
+      font-weight: 500;
+      color: var(--green-light);
+      display: block;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.52);
+    }
+
+    .stat-divider {
+      width: 1px;
+      background: rgba(255,255,255,0.18);
+      align-self: stretch;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 20;
+      background: rgba(5, 25, 10, 0.65);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bottom-links { display: flex; gap: 28px; }
+
+    .bottom-link {
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    .bottom-link:hover { color: var(--green-light); }
+
+    .sys-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-light);
+      box-shadow: 0 0 8px var(--green-light);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    @media (max-width: 768px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .features-section {
+        padding: 40px 15px;
+        margin-top: 50px;
+      }
+      
+      .feature-card {
+        padding: 25px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .stats { gap: 24px; }
+      .btn { padding: 13px 26px; font-size: 13px; }
+      .bottom-nav { flex-direction: column; gap: 8px; padding: 12px 20px; }
+      .section-title { font-size: 28px; }
+      .section-subtitle { font-size: 14px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- Static background image -->
 <div class="bg"></div>
-
-<!-- Dark overlay -->
 <div class="overlay"></div>
 
-<!-- MAIN CONTENT -->
 <div class="page">
-
-  <!-- College Logo -->
   <div class="college-logo">
-    <img src="assets/Logo.jpeg" alt="College Logo">
+    <img src="../assets/Logo.jpeg" alt="College Logo">
   </div>
 
-  <!-- College name -->
   <div class="college-name">Green Hills Engineering College &nbsp;&middot;&nbsp; Est. 2003</div>
 
-  <!-- Welcome line -->
   <div class="welcome-line">Welcome to</div>
 
-  <!-- Main heading -->
   <h1 class="main-heading">
     Attendance System
     <span>Using Facial Recognition</span>
   </h1>
 
-  <!-- Tagline -->
   <p class="tagline">
     Powered by facial recognition technology &mdash; secure, contactless, and effortless attendance tracking for students.
   </p>
 
-  <!-- CTA Buttons -->
   <div class="btn-group">
-    
-    <a href="#" onclick="navigate('attendance')" class="btn btn-primary">Mark Attendance</a>
-    
-    
-    <a href="#" onclick="navigate('register')" class="btn btn-outline">Register</a>
+    <button onclick="window.parent.navigate('attendance')" class="btn btn-primary">Mark Attendance</button>
+    <button onclick="window.parent.navigate('register')" class="btn btn-outline">Register</button>
   </div>
 
-  <!-- Stats -->
   <div class="stats">
     <div class="stat">
       <span class="stat-num">2,400+</span>
@@ -360,14 +520,199 @@
     </div>
   </div>
 
+  <!-- Features Section -->
+  <div class="features-section">
+    <h2 class="section-title">Why Choose Our System?</h2>
+    <p class="section-subtitle">
+      Experience the future of attendance management with cutting-edge <span>AI-powered facial recognition</span> technology
+    </p>
+
+    <div class="features-grid">
+      <!-- Feature 1: Real-time Face Detection -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-camera"></i>
+        </div>
+        <h3 class="feature-title">Real-time Face Detection</h3>
+        <p class="feature-description">
+          Advanced AI algorithms detect and recognize faces in milliseconds with 98.6% accuracy, even in varying lighting conditions.
+        </p>
+        <span class="feature-tag">Powered by LBPH</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">&lt; 0.5s</div>
+            <div class="feature-stat-label">Detection Time</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">99%</div>
+            <div class="feature-stat-label">Accuracy Rate</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Real-time Database Sync -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-database"></i>
+        </div>
+        <h3 class="feature-title">Real-time Database Sync</h3>
+        <p class="feature-description">
+          Instant synchronization with cloud database. Attendance records are updated immediately and accessible from anywhere.
+        </p>
+        <span class="feature-tag">Auto-Sync</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">Instant</div>
+            <div class="feature-stat-label">Update Speed</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">24/7</div>
+            <div class="feature-stat-label">Availability</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Monthly Reports -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 class="feature-title">Smart Monthly Reports</h3>
+        <p class="feature-description">
+          Generate comprehensive attendance reports with visual analytics, trends, and insights. Export in multiple formats.
+        </p>
+        <span class="feature-tag">Analytics</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">Auto</div>
+            <div class="feature-stat-label">Generation</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">CSV/PDF</div>
+            <div class="feature-stat-label">Export Format</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4: Achievement Notifications -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-bell"></i>
+        </div>
+        <h3 class="feature-title">Smart Notifications</h3>
+        <p class="feature-description">
+          Real-time alerts for achievements, milestones, and attendance updates. Celebrate perfect attendance and academic excellence.
+        </p>
+        <span class="feature-tag">Push Alerts</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">100%</div>
+            <div class="feature-stat-label">Delivery Rate</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">Multi-Channel</div>
+            <div class="feature-stat-label">Notifications</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 5: Anti-Spoofing Detection -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3 class="feature-title">Anti-Spoofing Protection</h3>
+        <p class="feature-description">
+          Advanced liveness detection prevents photo, video, and mask spoofing. Ensures only real people can mark attendance.
+        </p>
+        <span class="feature-tag">Security First</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">99.9%</div>
+            <div class="feature-stat-label">Spoof Detection</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">Real-time</div>
+            <div class="feature-stat-label">Verification</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 6: Multi-Face Detection -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 class="feature-title">Multi-Face Detection</h3>
+        <p class="feature-description">
+          Simultaneously detect and recognize multiple faces in a single frame. Perfect for group attendance marking.
+        </p>
+        <span class="feature-tag">Batch Processing</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">Up to 10</div>
+            <div class="feature-stat-label">Faces/Frame</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">95%</div>
+            <div class="feature-stat-label">Accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 7: Cross-Platform Access -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-mobile-alt"></i>
+        </div>
+        <h3 class="feature-title">Cross-Platform Support</h3>
+        <p class="feature-description">
+          Access the system from any device - desktop, tablet, or smartphone. Mobile-optimized interface for on-the-go marking.
+        </p>
+        <span class="feature-tag">Any Device</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">iOS/Android</div>
+            <div class="feature-stat-label">Mobile Support</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">All Browsers</div>
+            <div class="feature-stat-label">Compatible</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 8: Detailed Analytics -->
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-chart-pie"></i>
+        </div>
+        <h3 class="feature-title">Advanced Analytics</h3>
+        <p class="feature-description">
+          Deep insights into attendance patterns, trends, and predictive analysis for proactive intervention.
+        </p>
+        <span class="feature-tag">Data Insights</span>
+        <div class="feature-stats">
+          <div class="feature-stat">
+            <div class="feature-stat-value">12+</div>
+            <div class="feature-stat-label">Metrics</div>
+          </div>
+          <div class="feature-stat">
+            <div class="feature-stat-value">AI-Driven</div>
+            <div class="feature-stat-label">Predictions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- Bottom nav -->
 <div class="bottom-nav">
   <div class="bottom-links">
-     <a href="#" onclick="navigate('register')" class="bottom-link">Register</a>
-     <a href="#" onclick="navigate('attendance')" class="bottom-link">Attendance</a>
+    <a onclick="window.parent.navigate('register')" class="bottom-link">Register</a>
+    <a onclick="window.parent.navigate('attendance')" class="bottom-link">Attendance</a>
     <a href="#" class="bottom-link">Help</a>
+    <a href="#" class="bottom-link">About</a>
   </div>
   <div class="sys-status">
     <div class="status-dot"></div>
@@ -376,15 +721,40 @@
 </div>
 
 <script>
-  function tick() {
+  function updateDateTime() {
     const now = new Date();
-    const t = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const d = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
-    const el = document.querySelector('.sys-status');
-    if (el) el.innerHTML = `<div class="status-dot"></div> System Online &nbsp;&middot;&nbsp; ${d}, ${t}`;
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const date = now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+    const statusDiv = document.querySelector('.sys-status');
+    if (statusDiv) {
+      statusDiv.innerHTML = `<div class="status-dot"></div> System Online &nbsp;&middot;&nbsp; ${date}, ${time}`;
+    }
   }
-  setInterval(tick, 1000);
-  tick();
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+
+  // Add scroll animation for cards
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(card);
+  });
 </script>
+
 </body>
 </html>

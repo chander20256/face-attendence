@@ -1,33 +1,4 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <title>Face Attendance</title>
-</head>
-
-<body class="bg-gray-50">
-
-    <div id="navbar"></div>
-    <div id="app"></div>
-    <div id="footer"></div>
-
-    <script>
-        fetch("components/navbar.html")
-            .then(res => res.text())
-            .then(data => document.getElementById("navbar").innerHTML = data);
-
-        fetch("pages/landing.html")
-            .then(res => res.text())
-            .then(data => document.getElementById("app").innerHTML = data);
-
-    </script>
-
-</body>
-</html> -->
+<!-- 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,22 +8,20 @@
 
   <title>Face Attendance</title>
 
-  <!-- Tailwind -->
+ 
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-50">
 
 
-
-  <!-- Main App -->
   <div id="app" >
-    <!-- Loader -->
+
     <div class="text-gray-500 text-sm animate-pulse">Loading...</div>
   </div>
 
   <script>
-    // reusable loader
+  
     function loadComponent(id, file) {
       fetch(file)
         .then(res => {
@@ -69,15 +38,99 @@
     }
 
 
-    // default page
+  
     loadComponent("app", "pages/landing.html");
 
-    // SPA navigation
     function navigate(page) {
       loadComponent("app", `pages/${page}.html`);
       window.scrollTo(0, 0);
     }
   </script>
 
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Attendance System</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+  
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Main App Container -->
+  <div id="app" class="min-h-screen">
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="text-gray-500 text-sm animate-pulse">Loading...</div>
+    </div>
+  </div>
+
+  <script>
+    // Global navigation function
+    function navigate(page) {
+      loadComponent("app", `pages/${page}.html`);
+      window.scrollTo(0, 0);
+    }
+
+    // Load component dynamically
+    function loadComponent(elementId, filePath) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.innerHTML = '<div class="flex items-center justify-center min-h-screen"><div class="text-gray-500 text-sm animate-pulse">Loading...</div></div>';
+      }
+      
+      fetch(filePath)
+        .then(res => {
+          if (!res.ok) throw new Error(`Failed to load ${filePath}`);
+          return res.text();
+        })
+        .then(data => {
+          if (el) {
+            el.innerHTML = data;
+            // Re-attach any scripts in the loaded content
+            const scripts = el.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+              const newScript = document.createElement('script');
+              if (oldScript.src) {
+                newScript.src = oldScript.src;
+              } else {
+                newScript.textContent = oldScript.textContent;
+              }
+              document.body.appendChild(newScript);
+              oldScript.remove();
+            });
+          }
+        })
+        .catch(err => {
+          if (el) {
+            el.innerHTML = `
+              <div class="flex items-center justify-center min-h-screen">
+                <div class="text-red-500 text-center py-10">
+                  <p class="text-lg font-semibold">Error Loading Page</p>
+                  <p class="text-sm">${err.message}</p>
+                  <button onclick="loadComponent('app', 'pages/landing.html')" 
+                          class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    Go to Home
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        });
+    }
+
+    // Load default landing page
+    loadComponent("app", "pages/landing.html");
+  </script>
 </body>
 </html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Database</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f0faf2;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            background: #16a34a;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Database Checker</h1>
+        
+        <h2>Actions:</h2>
+        <button onclick="checkHealth()">Check Server Health</button>
+        <button onclick="getStudents()">Get All Students</button>
+        <button onclick="getTodayAttendance()">Get Today's Attendance</button>
+        <button onclick="addDemoStudent()">Add Demo Student</button>
+        <button onclick="clearDatabase()">⚠️ Clear All Data</button>
+        
+        <h2>Results:</h2>
+        <pre id="output">Click a button to see results...</pre>
+        
+        <h2>Manual Login Test:</h2>
+        <input type="text" id="testRoll" placeholder="Roll Number" style="width: 200px; padding: 5px;">
+        <input type="password" id="testPass" placeholder="Password" style="width: 200px; padding: 5px;">
+        <button onclick="testLogin()">Test Login</button>
+    </div>
+
+    <script>
+        const API = 'http://localhost:5000';
+        
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API}/api/health`);
+                const data = await res.json();
+                document.getElementById('output').innerHTML = JSON.stringify(data, null, 2);
+            } catch(e) {
+                document.getElementById('output').innerHTML = `❌ Error: ${e.message}\n\nMake sure server is running: python server.py`;
+            }
+        }
+        
+        async function getStudents() {
+            try {
+                const res = await fetch(`${API}/api/students`);
+                const data = await res.json();
+                document.getElementById('output').innerHTML = JSON.stringify(data, null, 2);
+                if (data.students && data.students.length === 0) {
+                    document.getElementById('output').innerHTML += '\n\n⚠️ No students found! Click "Add Demo Student" to add a test student.';
+                }
+            } catch(e) {
+                document.getElementById('output').innerHTML = `❌ Error: ${e.message}`;
+            }
+        }
+        
+        async function getTodayAttendance() {
+            try {
+                const res = await fetch(`${API}/api/attendance/today`);
+                const data = await res.json();
+                document.getElementById('output').innerHTML = JSON.stringify(data, null, 2);
+            } catch(e) {
+                document.getElementById('output').innerHTML = `❌ Error: ${e.message}`;
+            }
+        }
+        
+        async function addDemoStudent() {
+            const demoData = {
+                studentId: "22CS001",
+                firstName: "Aarav",
+                lastName: "Sharma",
+                email: "aarav@example.com",
+                phone: "9876543210",
+                dob: "2002-01-15",
+                gender: "Male",
+                dept: "Computer Science",
+                year: "3rd Year",
+                password: "password123",
+                emergencyName: "Raj Sharma",
+                emergencyPhone: "9988776655",
+                address: "123 Main Street",
+                profilePhoto: null,
+                faceImages: []  // Empty for demo, but you can add test images
+            };
+            
+            try {
+                const res = await fetch(`${API}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(demoData)
+                });
+                const data = await res.json();
+                document.getElementById('output').innerHTML = JSON.stringify(data, null, 2);
+                if (data.success) {
+                    document.getElementById('output').innerHTML += '\n\n✅ Demo student added successfully!\nRoll Number: 22CS001\nPassword: password123';
+                }
+            } catch(e) {
+                document.getElementById('output').innerHTML = `❌ Error: ${e.message}`;
+            }
+        }
+        
+        async function testLogin() {
+            const roll = document.getElementById('testRoll').value;
+            const pass = document.getElementById('testPass').value;
+            
+            if (!roll || !pass) {
+                alert('Please enter roll number and password');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rollNo: roll, password: pass })
+                });
+                const data = await res.json();
+                document.getElementById('output').innerHTML = JSON.stringify(data, null, 2);
+            } catch(e) {
+                document.getElementById('output').innerHTML = `❌ Error: ${e.message}`;
+            }
+        }
+        
+        async function clearDatabase() {
+            if (confirm('⚠️ This will delete ALL students and attendance data! Are you sure?')) {
+                try {
+                    const res = await fetch(`${API}/api/clear`, {
+                        method: 'POST'
+                    });
+                    const data = await res.json();
+                    document.getElementById('output').innerHTML = JSON.stringify(data, null, 2);
+                } catch(e) {
+                    document.getElementById('output').innerHTML = `❌ Error: ${e.message}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

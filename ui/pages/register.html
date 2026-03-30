@@ -61,7 +61,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
 .step-sub { font-size:11px; color:rgba(255,255,255,0.35); margin-top:2px; }
 
 .lp-bottom { margin-top:auto; font-size:12px; color:rgba(255,255,255,0.4); line-height:1.6; }
-.lp-bottom a { color:var(--green); text-decoration:none; }
+.lp-bottom a { color:var(--green); text-decoration:none; cursor:pointer; }
 
 /* ── RIGHT PANEL ── */
 .right-panel { padding:48px 52px; max-width:720px; }
@@ -203,7 +203,58 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
 .success-title { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:var(--text); margin-bottom:8px; }
 .success-sub { font-size:14px; color:var(--muted); margin-bottom:6px; }
 .success-id { font-family:'DM Mono',monospace; font-size:18px; font-weight:600; color:var(--green-d); margin:16px 0 24px; }
-.success-link { color:var(--green-d); text-decoration:none; font-weight:600; font-size:14px; }
+
+/* Error Modal */
+.error-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.error-modal.show { display: flex; }
+.error-modal-content {
+  background: white;
+  max-width: 500px;
+  padding: 32px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.error-modal-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.error-modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--error);
+  margin-bottom: 12px;
+}
+.error-modal-message {
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.error-modal button {
+  background: var(--green-d);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0 8px;
+}
+.error-modal button:hover { background: var(--green); }
 
 @media(max-width:900px) {
   .layout { grid-template-columns:1fr; }
@@ -219,7 +270,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
 
   <!-- LEFT PANEL -->
   <div class="left-panel">
-    <img src="assets/Logo.jpeg" alt="Logo" class="lp-logo">
+    <img src="assets/Logo.jpeg" alt="Logo" class="lp-logo" onerror="this.style.display='none'">
     <div class="lp-college">Green Hills Engineering College</div>
     <div class="lp-sub">EST. 2003 · ATTENDANCE PORTAL</div>
 
@@ -251,7 +302,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
     </div>
 
     <div class="lp-bottom">
-      Already registered? <a href="#" onclick="navigate('attendance')">Mark Attendance</a><br>
+      Already registered? <a href="#" onclick="goToAttendance()">Mark Attendance</a><br>
       <a href="index.html" style="color:rgba(255,255,255,0.35);">Back to Home</a>
     </div>
   </div>
@@ -318,9 +369,13 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
           <select id="dept">
             <option value="">Select department</option>
             <option>Computer Science</option>
+            <option>Information Technology</option>
             <option>Civil Engineering</option>
             <option>Electrical Engineering</option>
             <option>Mechanical Engineering</option>
+            <option>Electronics & Communication</option>
+            <option>Artificial Intelligence</option>
+            <option>Data Science</option>
           </select>
           <span class="err-msg" id="err-dept">Please select department</span>
         </div>
@@ -369,7 +424,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
               <div class="photo-box-text">Click to upload photo<span>JPG, PNG — max 5MB</span></div>
             </div>
           </div>
-          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+          <input type="file" id="photoInput" accept="image/jpeg,image/png" style="display:none" onchange="previewPhoto(this)">
           <span class="err-msg" id="err-photo">Please upload a profile photo</span>
         </div>
 
@@ -417,6 +472,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
         <button class="btn btn-cam" id="btnStart"  onclick="startCam()">Start Camera</button>
         <button class="btn btn-capture" id="btnCapture" onclick="doCapture()" disabled>Capture (0/5)</button>
         <button class="btn btn-stop"   id="btnStop"  onclick="stopCam()" style="display:none">Stop</button>
+        <button class="btn btn-outline" id="btnUploadOption" onclick="showUploadOption()" style="display:none">Upload Photos Instead</button>
       </div>
 
       <div class="capture-dots" id="captureDots">
@@ -428,6 +484,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
       </div>
 
       <div id="captureMsg" style="text-align:center;margin-top:12px;font-size:13px;color:var(--muted);min-height:20px;"></div>
+
+      <!-- Hidden file input for photo upload fallback -->
+      <input type="file" id="photoUploadFallback" accept="image/jpeg,image/png" multiple style="display:none" onchange="handlePhotoUpload(this)">
 
       <!-- Consent -->
       <div class="consent-row">
@@ -445,19 +504,41 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
     </div>
 
     <!-- SUCCESS SCREEN -->
-    <div class="success-screen" id="successScreen">
-      <div class="success-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-      </div>
-      <div class="success-title">Registration Complete!</div>
-      <div class="success-sub">Your face data has been saved and model has been trained.</div>
-      <div class="success-id" id="successRoll"></div>
-      <div class="success-sub" style="margin-bottom:24px">You can now mark attendance using facial recognition.</div>
-      <a href="attendance.html" class="btn btn-primary" style="text-decoration:none;display:inline-flex">Go to Attendance &rarr;</a>
-    </div>
+    <!-- SUCCESS SCREEN -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <div class="success-title">Registration Complete!</div>
+  <div class="success-sub">Your face data has been saved and model has been trained.</div>
+  <div class="success-id" id="successRoll"></div>
+  <div class="success-sub" style="margin-bottom:24px">You can now mark attendance using facial recognition.</div>
+  <button class="btn btn-primary" onclick="goToAttendance()" style="text-decoration:none;display:inline-flex">Go to Attendance &rarr;</button>
+</div>
 
   </div><!-- /right-panel -->
 </div><!-- /layout -->
+
+<!-- Error Modal -->
+<div class="error-modal" id="errorModal">
+  <div class="error-modal-content">
+    <div class="error-modal-icon">📷</div>
+    <div class="error-modal-title">Camera Access Issue</div>
+    <div class="error-modal-message" id="errorModalMessage">
+      Camera is not accessible. This could be because:<br><br>
+      • Another application is using the camera<br>
+      • Browser permissions are blocked<br>
+      • No camera is connected<br><br>
+      <strong>Solutions:</strong><br>
+      1. Close other apps (Zoom, Teams, Skype, etc.)<br>
+      2. Check browser camera permissions<br>
+      3. Try a different browser (Chrome, Edge, Firefox)<br>
+      4. Click "Upload Photos Instead" to continue
+    </div>
+    <button onclick="closeErrorModal()">Try Again</button>
+    <button onclick="showUploadOption()">Upload Photos Instead</button>
+  </div>
+</div>
 
 <script>
 // =====================================================================
@@ -467,21 +548,135 @@ let currentStep    = 0;
 let camStream      = null;
 let drawLoop       = null;
 let captureCount   = 0;
-let capturedImages = [];   // array of base64 jpeg strings
+let capturedImages = [];
+let profilePhotoBase64 = null;
 
 const video  = document.getElementById('videoEl');
 const canvas = document.getElementById('liveCanvas');
 const snap   = document.getElementById('snapCanvas');
 
 // =====================================================================
+//  NAVIGATION FUNCTION
+// =====================================================================
+function goToAttendance() {
+  // Check if attendance.html exists, if not, go to index.html
+  fetch('attendance.html')
+    .then(response => {
+      if (response.ok) {
+        window.location.href = 'attendance.html';
+      } else {
+        // If attendance.html doesn't exist, go to index.html
+        window.location.href = 'index.html';
+      }
+    })
+    .catch(() => {
+      window.location.href = 'index.html';
+    });
+}
+
+// =====================================================================
+//  ERROR HANDLING
+// =====================================================================
+function showErrorModal(message) {
+  const modal = document.getElementById('errorModal');
+  const msgElement = document.getElementById('errorModalMessage');
+  if (message) {
+    msgElement.innerHTML = message;
+  }
+  modal.classList.add('show');
+}
+
+function closeErrorModal() {
+  const modal = document.getElementById('errorModal');
+  modal.classList.remove('show');
+}
+
+function showUploadOption() {
+  closeErrorModal();
+  document.getElementById('btnUploadOption').style.display = 'inline-flex';
+  document.getElementById('btnStart').style.display = 'none';
+  document.getElementById('btnStop').style.display = 'none';
+  document.getElementById('camPlaceholder').innerHTML = `
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    Camera not available<br>Click below to upload 5 face photos
+  `;
+  document.getElementById('btnCapture').style.display = 'none';
+  document.getElementById('camStatus').style.display = 'none';
+  document.getElementById('camCounter').style.display = 'none';
+  
+  if (!document.getElementById('uploadPhotosBtn')) {
+    const uploadBtn = document.createElement('button');
+    uploadBtn.id = 'uploadPhotosBtn';
+    uploadBtn.className = 'btn btn-primary';
+    uploadBtn.innerHTML = '📁 Select 5 Face Photos';
+    uploadBtn.style.marginTop = '10px';
+    uploadBtn.style.width = '100%';
+    uploadBtn.onclick = () => document.getElementById('photoUploadFallback').click();
+    document.getElementById('cameraWrap').parentNode.insertBefore(uploadBtn, document.getElementById('cameraWrap').nextSibling);
+  }
+}
+
+function handlePhotoUpload(input) {
+  const files = Array.from(input.files);
+  if (files.length !== 5) {
+    alert('Please select exactly 5 photos (one for each capture dot)');
+    return;
+  }
+  
+  capturedImages = [];
+  captureCount = 0;
+  
+  // Reset dots
+  for (let i = 0; i < 5; i++) {
+    const dot = document.getElementById('dot' + i);
+    if (dot) {
+      dot.classList.remove('captured');
+      dot.textContent = (i + 1).toString();
+    }
+  }
+  
+  files.forEach((file, index) => {
+    if (index >= 5) return;
+    if (!file.type.startsWith('image/')) {
+      alert(`File ${index + 1} is not an image`);
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert(`File ${index + 1} is too large (max 5MB)`);
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      capturedImages.push(e.target.result);
+      captureCount++;
+      
+      // Update dot
+      const dot = document.getElementById('dot' + (captureCount - 1));
+      if (dot) {
+        dot.classList.add('captured');
+        dot.textContent = '';
+      }
+      
+      document.getElementById('camCounter').textContent = captureCount + ' / 5';
+      document.getElementById('captureMsg').textContent = `Uploaded ${captureCount}/5 photos`;
+      
+      if (captureCount === 5) {
+        document.getElementById('captureMsg').textContent = 'Great! All 5 photos uploaded. Now accept consent and complete registration.';
+        document.getElementById('captureMsg').style.color = 'var(--success)';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// =====================================================================
 //  STEP NAVIGATION
 // =====================================================================
 function setStep(step) {
-  // Hide all sections
   document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
   document.getElementById('section' + step).classList.add('active');
 
-  // Update indicators
   for (let i = 0; i < 3; i++) {
     const ind = document.getElementById('ind' + i);
     ind.classList.remove('active', 'done');
@@ -489,7 +684,6 @@ function setStep(step) {
     if (i === step) ind.classList.add('active');
   }
 
-  // Progress bar
   const pcts   = ['33%', '66%', '100%'];
   const labels = ['Step 1 of 3', 'Step 2 of 3', 'Step 3 of 3'];
   document.getElementById('progressFill').style.width  = pcts[step];
@@ -500,7 +694,12 @@ function setStep(step) {
   window.scrollTo(0, 0);
 }
 
-function prevStep(from) { setStep(from - 1); }
+function prevStep(from) {
+  if (from === 2 && camStream) {
+    stopCam();
+  }
+  setStep(from - 1);
+}
 
 function nextStep(from) {
   if (!validateStep(from)) return;
@@ -552,7 +751,7 @@ function validateStep(step) {
   if (step === 1) {
     const ep = document.getElementById('emergencyPhone').value.trim();
     const en = document.getElementById('emergencyName').value.trim();
-    const hasPhoto = document.getElementById('photoInput').files.length > 0;
+    const hasPhoto = document.getElementById('photoInput').files.length > 0 || profilePhotoBase64 !== null;
 
     setErr('photo',          !hasPhoto);
     setErr('emergencyName',  !en);
@@ -565,41 +764,72 @@ function validateStep(step) {
 }
 
 // =====================================================================
-//  PHOTO PREVIEW
+//  PHOTO PREVIEW & CONVERSION
 // =====================================================================
-function previewPhoto(input) {
-  if (!input.files.length) return;
+async function previewPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) {
+    alert('Please upload an image file (JPG, PNG)');
+    input.value = '';
+    return;
+  }
+  
+  if (file.size > 5 * 1024 * 1024) {
+    alert('File too large! Maximum size is 5MB');
+    input.value = '';
+    return;
+  }
+  
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async (e) => {
+    profilePhotoBase64 = e.target.result;
     document.getElementById('photoPreviewImg').src = e.target.result;
     document.getElementById('photoPreviewWrap').style.display = 'block';
     document.getElementById('photoPlaceholder').style.display = 'none';
   };
-  reader.readAsDataURL(input.files[0]);
+  reader.readAsDataURL(file);
 }
 
 // =====================================================================
-//  CAMERA
+//  CAMERA FUNCTIONS
 // =====================================================================
 async function startCam() {
   try {
-    camStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
-    });
-
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const hasCamera = devices.some(device => device.kind === 'videoinput');
+    
+    if (!hasCamera) {
+      showErrorModal('No camera detected on your device. Please connect a webcam or use the "Upload Photos Instead" option.');
+      return;
+    }
+    
+    const constraints = {
+      video: {
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+        facingMode: 'user'
+      }
+    };
+    
+    camStream = await navigator.mediaDevices.getUserMedia(constraints);
+    
     video.srcObject = camStream;
 
-    // Wait for video to have real frame data
-    await new Promise(resolve => {
-      video.onloadeddata = () => { if (video.videoWidth > 0) resolve(); };
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('Video timeout')), 8000);
+      video.onloadeddata = () => { 
+        if (video.videoWidth > 0) {
+          clearTimeout(timeout);
+          resolve(); 
+        }
+      };
       video.onloadedmetadata = () => video.play().catch(() => {});
-      setTimeout(resolve, 5000); // max wait 5s
     });
 
-    // Extra wait for first painted frame
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 500));
 
-    // Set canvas dimensions
     const W = video.videoWidth  || 640;
     const H = video.videoHeight || 480;
     canvas.width  = W;
@@ -607,7 +837,6 @@ async function startCam() {
     snap.width    = 200;
     snap.height   = 200;
 
-    // Show canvas
     canvas.style.display     = 'block';
     document.getElementById('camPlaceholder').style.display = 'none';
     document.getElementById('camStatus').style.display      = 'block';
@@ -616,17 +845,35 @@ async function startCam() {
     document.getElementById('btnStop').style.display        = 'inline-flex';
     document.getElementById('btnCapture').disabled          = false;
 
-    // Start drawing
     startDrawLoop();
 
   } catch (e) {
-    console.error(e);
-    let msg = 'Camera Error: ';
-    if (e.name === 'NotAllowedError')   msg += 'Permission denied. Click the camera icon in your browser address bar and set to Allow.';
-    else if (e.name === 'NotFoundError') msg += 'No camera found. Please connect a webcam.';
-    else if (e.name === 'NotReadableError') msg += 'Camera is in use by another app. Close Zoom / Teams / Skype and try again.';
-    else msg += e.message;
-    alert(msg);
+    console.error('Camera error:', e);
+    let errorMessage = '';
+    
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      errorMessage = `Camera permission denied. Please:<br><br>
+      1. Click the camera icon in the address bar<br>
+      2. Select "Allow" for camera access<br>
+      3. Refresh the page and try again<br><br>
+      Or click "Upload Photos Instead" to continue.`;
+    } 
+    else if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') {
+      errorMessage = 'No camera found on your device. Please connect a webcam or use the "Upload Photos Instead" option.';
+    }
+    else if (e.name === 'NotReadableError' || e.name === 'TrackStartError') {
+      errorMessage = `Camera is being used by another application.<br><br>
+      Please close:<br>
+      • Zoom, Teams, Skype, or any video conferencing app<br>
+      • Other browser tabs using camera<br>
+      • Any screen recording software<br><br>
+      After closing, click "Try Again" or use "Upload Photos Instead".`;
+    }
+    else {
+      errorMessage = `Camera error: ${e.message}<br><br>Try using the "Upload Photos Instead" option.`;
+    }
+    
+    showErrorModal(errorMessage);
   }
 }
 
@@ -636,16 +883,17 @@ function startDrawLoop() {
   const H   = canvas.height;
 
   function draw() {
-    if (!camStream) return;
+    if (!camStream || !video.videoWidth || video.readyState < 2) {
+      drawLoop = requestAnimationFrame(draw);
+      return;
+    }
 
-    // Draw mirrored video
     ctx.save();
     ctx.translate(W, 0);
     ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0, W, H);
     ctx.restore();
 
-    // Oval guide
     ctx.strokeStyle = captureCount >= 5 ? 'rgba(34,197,94,1)' : 'rgba(34,197,94,0.8)';
     ctx.lineWidth   = 3;
     ctx.setLineDash([10, 5]);
@@ -654,7 +902,6 @@ function startDrawLoop() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Oval label
     ctx.fillStyle = 'rgba(34,197,94,0.85)';
     ctx.font      = 'bold 14px monospace';
     ctx.textAlign = 'center';
@@ -670,8 +917,14 @@ function startDrawLoop() {
 }
 
 function stopCam() {
-  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
-  if (drawLoop)  { cancelAnimationFrame(drawLoop); drawLoop = null; }
+  if (camStream) { 
+    camStream.getTracks().forEach(t => t.stop()); 
+    camStream = null; 
+  }
+  if (drawLoop)  { 
+    cancelAnimationFrame(drawLoop); 
+    drawLoop = null; 
+  }
 
   canvas.style.display    = 'none';
   document.getElementById('camPlaceholder').style.display = 'flex';
@@ -688,7 +941,6 @@ function stopCam() {
 function doCapture() {
   if (captureCount >= 5) return;
 
-  // Safety: canvas must have real pixel data
   if (!camStream || canvas.width === 0 || canvas.height === 0) {
     alert('Camera is not ready yet. Please wait a moment.');
     return;
@@ -697,7 +949,6 @@ function doCapture() {
   const W = canvas.width;
   const H = canvas.height;
 
-  // Crop the center portion where the face oval is (middle 60% width, 85% height)
   const cropX = W * 0.20;
   const cropY = H * 0.08;
   const cropW = W * 0.60;
@@ -708,22 +959,23 @@ function doCapture() {
   snap.height = 200;
   snapCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, 200, 200);
 
-  // Save as base64
   const imgData = snap.toDataURL('image/jpeg', 0.95);
   capturedImages.push(imgData);
 
-  // Flash green on main canvas
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = 'rgba(34,197,94,0.4)';
   ctx.fillRect(0, 0, W, H);
+  
+  setTimeout(() => {}, 100);
 
-  // Update dot
   const dot = document.getElementById('dot' + captureCount);
-  if (dot) { dot.classList.add('captured'); dot.textContent = ''; }
+  if (dot) { 
+    dot.classList.add('captured'); 
+    dot.textContent = ''; 
+  }
 
   captureCount++;
 
-  // Update UI
   document.getElementById('camCounter').textContent = captureCount + ' / 5';
   document.getElementById('camStatus').textContent  =
     captureCount >= 5
@@ -750,7 +1002,7 @@ async function submitForm() {
     return;
   }
   if (captureCount < 5) {
-    alert('Please capture all 5 face images before submitting.');
+    alert('Please capture/upload all 5 face images before submitting.');
     return;
   }
 
@@ -758,7 +1010,9 @@ async function submitForm() {
   btn.disabled    = true;
   btn.textContent = 'Submitting...';
 
-  stopCam();
+  if (camStream) {
+    stopCam();
+  }
 
   const payload = {
     firstName:   document.getElementById('firstName').value.trim(),
@@ -771,6 +1025,10 @@ async function submitForm() {
     dept:        document.getElementById('dept').value,
     year:        document.getElementById('year').value,
     password:    document.getElementById('password').value,
+    emergencyName: document.getElementById('emergencyName').value.trim(),
+    emergencyPhone: document.getElementById('emergencyPhone').value.trim(),
+    address:     document.getElementById('address').value.trim(),
+    profilePhoto: profilePhotoBase64,
     faceImages:  capturedImages
   };
 
@@ -790,13 +1048,14 @@ async function submitForm() {
       btn.textContent = 'Complete Registration';
     }
   } catch(e) {
-    // Server offline — save to localStorage as fallback
     console.warn('Server offline, saving to localStorage');
     localStorage.setItem('student_' + payload.studentId, JSON.stringify({
       name:  payload.firstName + ' ' + payload.lastName,
       roll:  payload.studentId,
       dept:  payload.dept,
       year:  payload.year,
+      email: payload.email,
+      phone: payload.phone,
       faceRegistered: true,
       faceData: capturedImages[0] || null
     }));
