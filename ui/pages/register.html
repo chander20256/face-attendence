@@ -550,6 +550,9 @@ let drawLoop       = null;
 let captureCount   = 0;
 let capturedImages = [];
 let profilePhotoBase64 = null;
+const API_BASE =
+  window.FACE_ATTENDANCE_API ||
+  (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
 
 const video  = document.getElementById('videoEl');
 const canvas = document.getElementById('liveCanvas');
@@ -559,19 +562,11 @@ const snap   = document.getElementById('snapCanvas');
 //  NAVIGATION FUNCTION
 // =====================================================================
 function goToAttendance() {
-  // Check if attendance.html exists, if not, go to index.html
-  fetch('attendance.html')
-    .then(response => {
-      if (response.ok) {
-        window.location.href = 'attendance.html';
-      } else {
-        // If attendance.html doesn't exist, go to index.html
-        window.location.href = 'index.html';
-      }
-    })
-    .catch(() => {
-      window.location.href = 'index.html';
-    });
+  if (window.parent && window.parent !== window && typeof window.parent.navigate === 'function') {
+    window.parent.navigate('attendance');
+    return;
+  }
+  window.location.href = 'attendance.html';
 }
 
 // =====================================================================
@@ -1033,7 +1028,7 @@ async function submitForm() {
   };
 
   try {
-    const res    = await fetch('http://localhost:5000/api/register', {
+    const res    = await fetch(`${API_BASE}/api/register`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload)
@@ -1048,18 +1043,9 @@ async function submitForm() {
       btn.textContent = 'Complete Registration';
     }
   } catch(e) {
-    console.warn('Server offline, saving to localStorage');
-    localStorage.setItem('student_' + payload.studentId, JSON.stringify({
-      name:  payload.firstName + ' ' + payload.lastName,
-      roll:  payload.studentId,
-      dept:  payload.dept,
-      year:  payload.year,
-      email: payload.email,
-      phone: payload.phone,
-      faceRegistered: true,
-      faceData: capturedImages[0] || null
-    }));
-    showSuccess(payload.studentId);
+    alert('Registration could not be completed. Please make sure the backend server and Supabase are configured.');
+    btn.disabled    = false;
+    btn.textContent = 'Complete Registration';
   }
 }
 

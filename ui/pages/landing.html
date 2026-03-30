@@ -499,8 +499,8 @@
   </p>
 
   <div class="btn-group">
-    <button onclick="window.parent.navigate('attendance')" class="btn btn-primary">Mark Attendance</button>
-    <button onclick="window.parent.navigate('register')" class="btn btn-outline">Register</button>
+    <button onclick="goToPage('attendance')" class="btn btn-primary">Mark Attendance</button>
+    <button onclick="goToPage('register')" class="btn btn-outline">Register</button>
   </div>
 
   <div class="stats">
@@ -709,8 +709,8 @@
 
 <div class="bottom-nav">
   <div class="bottom-links">
-    <a onclick="window.parent.navigate('register')" class="bottom-link">Register</a>
-    <a onclick="window.parent.navigate('attendance')" class="bottom-link">Attendance</a>
+    <a onclick="goToPage('register')" class="bottom-link">Register</a>
+    <a onclick="goToPage('attendance')" class="bottom-link">Attendance</a>
     <a href="#" class="bottom-link">Help</a>
     <a href="#" class="bottom-link">About</a>
   </div>
@@ -721,6 +721,14 @@
 </div>
 
 <script>
+  function goToPage(page) {
+    if (window.parent && window.parent !== window && typeof window.parent.navigate === 'function') {
+      window.parent.navigate(page);
+      return;
+    }
+    window.location.href = page + '.html';
+  }
+
   function updateDateTime() {
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

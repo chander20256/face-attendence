@@ -24,6 +24,21 @@ import subprocess
 import threading
 import time
 
+def load_local_env():
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if not os.path.exists(env_path):
+        return
+    with open(env_path, "r", encoding="utf-8") as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+load_local_env()
+APP_PORT = int(os.getenv("APP_PORT", "5050"))
+
 def start_server():
     """Start Flask server in background"""
     try:
@@ -52,19 +67,12 @@ def main():
     
     # Wait a bit for server to initialize
     time.sleep(2)
-    
-    # Get absolute path to UI folder
-    if getattr(sys, 'frozen', False):
-        base_dir = sys._MEIPASS
-    else:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    html_path = os.path.join(base_dir, "ui", "index.html")
+    app_url = f"http://127.0.0.1:{APP_PORT}"
     
     # Create window
     webview.create_window(
         "Face Attendance System",
-        html_path,
+        app_url,
         width=1200,
         height=700,
         resizable=True,

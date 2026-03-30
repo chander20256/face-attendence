@@ -76,9 +76,26 @@
   </div>
 
   <script>
-    // Global navigation function
-    function navigate(page) {
-      loadComponent("app", `pages/${page}.html`);
+    const ROUTES = {
+      home: { path: '/', file: 'pages/landing.html' },
+      register: { path: '/register', file: 'pages/register.html' },
+      attendance: { path: '/attendance', file: 'pages/attendance.html' }
+    };
+
+    function routeFromLocation() {
+      const path = window.location.pathname.replace(/\/+$/, '') || '/';
+      if (path === '/register' || path === '/register.html') return 'register';
+      if (path === '/attendance' || path === '/attendance.html') return 'attendance';
+      return 'home';
+    }
+
+    function navigate(page, replace = false) {
+      const route = ROUTES[page] || ROUTES.home;
+      loadComponent("app", route.file);
+      if (window.location.pathname !== route.path) {
+        const method = replace ? 'replaceState' : 'pushState';
+        window.history[method]({ page }, '', route.path);
+      }
       window.scrollTo(0, 0);
     }
 
@@ -118,7 +135,7 @@
                 <div class="text-red-500 text-center py-10">
                   <p class="text-lg font-semibold">Error Loading Page</p>
                   <p class="text-sm">${err.message}</p>
-                  <button onclick="loadComponent('app', 'pages/landing.html')" 
+                  <button onclick="navigate('home', true)" 
                           class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                     Go to Home
                   </button>
@@ -129,8 +146,11 @@
         });
     }
 
-    // Load default landing page
-    loadComponent("app", "pages/landing.html");
+    window.addEventListener('popstate', () => {
+      navigate(routeFromLocation(), true);
+    });
+
+    navigate(routeFromLocation(), true);
   </script>
 </body>
 </html>

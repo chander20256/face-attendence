@@ -1278,9 +1278,16 @@
   let fpsTimer = null;
   let driftTimer = null;
   let logEntries = [];
+  const API_BASE =
+    window.FACE_ATTENDANCE_API ||
+    (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
 
   // Navigation function
   function goToRegister() {
+    if (window.parent && window.parent !== window && typeof window.parent.navigate === 'function') {
+      window.parent.navigate('register');
+      return;
+    }
     window.location.href = 'register.html';
   }
 
@@ -1305,30 +1312,8 @@
     btn.disabled   = true;
     btn.textContent = 'Signing in...';
 
-    // Demo login for testing
-    if (roll === "demo" && pw === "demo") {
-      loggedInUser = {
-        name: "Demo Student",
-        roll_no: roll,
-        dept: "Computer Science",
-        year: "3rd Year"
-      };
-      document.getElementById('loginOverlay').style.display = 'none';
-      document.getElementById('mainApp').classList.add('show');
-      document.getElementById('navAvatar').textContent = "DS";
-      document.getElementById('navUserName').textContent = "Demo Student";
-      document.getElementById('siDept').textContent = "Computer Science";
-      tickClock();
-      loadDemoStats();
-      loadDemoLog();
-      loadDemoAbsent();
-      btn.disabled = false;
-      btn.textContent = 'Sign In & Mark Attendance';
-      return;
-    }
-
     try {
-      const res  = await fetch('http://localhost:5000/api/login', {
+      const res  = await fetch(`${API_BASE}/api/login`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ rollNo: roll, password: pw })
@@ -1347,27 +1332,14 @@
         loadTodayStats();
         loadTodayLog();
         loadAbsentList();
+        resetScan();
       } else {
         errPw.textContent = data.message || 'Invalid roll number or password.';
         errPw.classList.add('show');
       }
     } catch(e) {
-      // Demo mode for testing
-      loggedInUser = {
-        name: "Test Student",
-        roll_no: roll,
-        dept: "Computer Science",
-        year: "3rd Year"
-      };
-      document.getElementById('loginOverlay').style.display = 'none';
-      document.getElementById('mainApp').classList.add('show');
-      document.getElementById('navAvatar').textContent = "TS";
-      document.getElementById('navUserName').textContent = "Test Student";
-      document.getElementById('siDept').textContent = "Computer Science";
-      tickClock();
-      loadDemoStats();
-      loadDemoLog();
-      loadDemoAbsent();
+      errPw.textContent = 'Could not reach the server. Please start the backend and check Supabase config.';
+      errPw.classList.add('show');
     }
 
     btn.disabled    = false;
@@ -1476,7 +1448,8 @@
     const box = document.getElementById('faceBox');
     const w = vp.offsetWidth;
     const h = vp.offsetHeight;
-    const bw = 160; const bh = 190;
+    const bw = Math.min(Math.max(w * 0.32, 290), 420);
+    const bh = Math.min(Math.max(h * 0.56, 330), 480);
     box.style.cssText = `display:block;width:${bw}px;height:${bh}px;left:${(w-bw)/2}px;top:${(h-bh)/2}px;`;
     document.getElementById('hudStatus').textContent = 'Face Detected';
     document.getElementById('faceLabel').textContent = 'POSITION FACE HERE';
@@ -1512,10 +1485,40 @@
   function captureFrame() {
     const video = document.getElementById('camVideo');
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    return canvas.toDataURL('image/jpeg', 0.9);
+    const faceBox = document.getElementById('faceBox');
+    const videoRect = video.getBoundingClientRect();
+    const boxRect = faceBox.getBoundingClientRect();
+    const scaleX = (video.videoWidth || 640) / Math.max(videoRect.width, 1);
+    const scaleY = (video.videoHeight || 480) / Math.max(videoRect.height, 1);
+
+    let sx = 0;
+    let sy = 0;
+    let sw = video.videoWidth || 640;
+    let sh = video.videoHeight || 480;
+
+    if (boxRect.width > 0 && boxRect.height > 0) {
+      const padX = boxRect.width * 0.38;
+      const padY = boxRect.height * 0.30;
+      const rawX = (boxRect.left - videoRect.left - padX) * scaleX;
+      const rawY = (boxRect.top - videoRect.top - padY) * scaleY;
+      const rawW = (boxRect.width + padX * 2) * scaleX;
+      const rawH = (boxRect.height + padY * 2) * scaleY;
+
+      sx = Math.max(0, rawX);
+      sy = Math.max(0, rawY);
+      sw = Math.min((video.videoWidth || 640) - sx, rawW);
+      sh = Math.min((video.videoHeight || 480) - sy, rawH);
+    }
+
+    canvas.width = 320;
+    canvas.height = 320;
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    return canvas.toDataURL('image/jpeg', 0.92);
   }
 
   // ---- SCAN ------------------------------------------------------------
@@ -1543,10 +1546,14 @@
     try {
       const imageData = captureFrame();
 
-      const res = await fetch('http://localhost:5000/api/recognize', {
+      const res = await fetch(`${API_BASE}/api/recognize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageData })
+        body: JSON.stringify({
+          image: imageData,
+          rollNo: loggedInUser.roll_no,
+          accessToken: loggedInUser.access_token
+        })
       });
       const result = await res.json();
 
@@ -1559,30 +1566,12 @@
       if (result.success) {
         showPresent(result.student, finalConf, result.already_marked);
       } else {
-        // Demo mode - show random success for testing
-        const demoStudent = {
-          name: "Aarav Sharma",
-          roll_no: "22CS001",
-          dept: "Computer Science",
-          year: "3rd Year",
-          present: 42,
-          absent: 5
-        };
-        showPresent(demoStudent, finalConf, false);
+        showError('Face Match Failed', result.message || 'The live face did not match the registered images.');
       }
 
     } catch (e) {
       clearInterval(confInterval);
-      // Demo mode - simulate successful recognition
-      const demoStudent = {
-        name: "Aarav Sharma",
-        roll_no: "22CS001",
-        dept: "Computer Science",
-        year: "3rd Year",
-        present: 42,
-        absent: 5
-      };
-      showPresent(demoStudent, 87.5, false);
+      showError('Scan Error', 'The face verification request could not be completed.');
     }
 
     btn.disabled = false;
@@ -1652,19 +1641,19 @@
   // ---- LOAD FROM SERVER ------------------------------------------------
   async function loadTodayStats() {
     try {
-      const res = await fetch('http://localhost:5000/api/students');
+      const res = await fetch(`${API_BASE}/api/students`);
       const data = await res.json();
       if (data.success) {
         document.getElementById('siTotalStudents').textContent = data.students.length;
       }
     } catch (e) {
-      loadDemoStats();
+      document.getElementById('siTotalStudents').textContent = '--';
     }
   }
 
   async function loadTodayLog() {
     try {
-      const res = await fetch('http://localhost:5000/api/attendance/today');
+      const res = await fetch(`${API_BASE}/api/attendance/today`);
       const data = await res.json();
       if (data.success) {
         logEntries = data.entries.map(e => ({
@@ -1678,15 +1667,16 @@
         document.getElementById('siCount').textContent = logEntries.length;
       }
     } catch(e) {
-      loadDemoLog();
+      logEntries = [];
+      updateLog();
     }
   }
 
   async function loadAbsentList() {
     try {
       const [studRes, attRes] = await Promise.all([
-        fetch('http://localhost:5000/api/students'),
-        fetch('http://localhost:5000/api/attendance/today')
+        fetch(`${API_BASE}/api/students`),
+        fetch(`${API_BASE}/api/attendance/today`)
       ]);
       const studData = await studRes.json();
       const attData = await attRes.json();
@@ -1726,7 +1716,8 @@
       }).join('');
 
     } catch(e) {
-      loadDemoAbsent();
+      document.getElementById('absentCount').textContent = '--';
+      document.getElementById('absentList').innerHTML = '<div class="log-empty">Absent list unavailable right now.</div>';
     }
   }
 
