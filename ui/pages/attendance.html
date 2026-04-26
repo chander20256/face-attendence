@@ -30,6 +30,56 @@
     min-height: 100vh;
   }
 
+  .global-top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 18px;
+    background: rgba(20, 83, 45, 0.95);
+    border-bottom: 1px solid rgba(255,255,255,0.18);
+  }
+
+  .global-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .global-nav-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .global-nav-links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+  .global-nav-link {
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .global-nav-link:hover {
+    border-color: var(--accent);
+    background: rgba(34,197,94,0.18);
+  }
+
   /* subtle dot pattern bg */
   body::before {
     content: '';
@@ -44,7 +94,10 @@
   /* ===================== LOGIN OVERLAY ===================== */
   .login-overlay {
     position: fixed;
-    inset: 0;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 200;
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     display: flex;
@@ -993,10 +1046,24 @@
     .right-panel { height: auto; position: relative; top: 0; }
     .login-left { display: none; }
     .login-right { padding: 36px 28px; }
+    .global-top-nav { padding: 9px 12px; }
+    .global-nav-brand { font-size: 11px; }
+    .global-nav-link { font-size: 10px; padding: 6px 10px; }
   }
 </style>
 </head>
 <body>
+<nav class="global-top-nav" id="pageTopNav">
+  <div class="global-nav-brand">
+    <img src="assets/Logo.jpeg" alt="Logo" class="global-nav-logo" onerror="this.style.display='none'">
+    Green Hills Engineering College
+  </div>
+  <div class="global-nav-links">
+    <button class="global-nav-link" onclick="goHome()">Home</button>
+    <button class="global-nav-link" onclick="goToRegister()">Register</button>
+    <button class="global-nav-link">Attendance</button>
+  </div>
+</nav>
 
 <!-- ===================== LOGIN OVERLAY ===================== -->
 <div class="login-overlay" id="loginOverlay">
@@ -1291,6 +1358,14 @@
     window.location.href = 'register.html';
   }
 
+  function goHome() {
+    if (window.parent && window.parent !== window && typeof window.parent.navigate === 'function') {
+      window.parent.navigate('home');
+      return;
+    }
+    window.location.href = '/';
+  }
+
   // ---- LOGIN -----------------------------------------------------------
   async function doLogin() {
     const roll = document.getElementById('loginRoll').value.trim();
@@ -1323,6 +1398,7 @@
       if (data.success) {
         loggedInUser = data.student;
         document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('pageTopNav').style.display = 'none';
         document.getElementById('mainApp').classList.add('show');
         const initials = loggedInUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
         document.getElementById('navAvatar').textContent = initials;
@@ -1352,6 +1428,7 @@
     logEntries = [];
     document.getElementById('mainApp').classList.remove('show');
     document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('pageTopNav').style.display = 'flex';
     document.getElementById('loginRoll').value = '';
     document.getElementById('loginPw').value = '';
     document.getElementById('err-loginRoll').classList.remove('show');
