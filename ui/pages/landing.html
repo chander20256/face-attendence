@@ -25,6 +25,60 @@
       overflow-y: auto;
     }
 
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(12, 30, 16, 0.72);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-link {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 12px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(34, 197, 94, 0.8);
+      background: rgba(34, 197, 94, 0.2);
+    }
+
     /* Static background image */
     .bg {
       position: fixed;
@@ -58,7 +112,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px 90px 20px;
+      padding: 100px 20px 90px 20px;
       text-align: center;
     }
 
@@ -480,6 +534,18 @@
 <div class="bg"></div>
 <div class="overlay"></div>
 
+<nav class="top-nav">
+  <div class="nav-brand">
+    <img src="../assets/Logo.jpeg" alt="College Logo" class="nav-logo" onerror="this.style.display='none'">
+    Green Hills Engineering College
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="goToPage('home')">Home</button>
+    <button class="nav-link" onclick="goToPage('register')">Register</button>
+    <button class="nav-link" onclick="goToPage('attendance')">Attendance</button>
+  </div>
+</nav>
+
 <div class="page">
   <div class="college-logo">
     <img src="../assets/Logo.jpeg" alt="College Logo">
@@ -722,6 +788,14 @@
 
 <script>
   function goToPage(page) {
+    if (page === 'home') {
+      if (window.parent && window.parent !== window && typeof window.parent.navigate === 'function') {
+        window.parent.navigate('home');
+        return;
+      }
+      window.location.href = '/';
+      return;
+    }
     if (window.parent && window.parent !== window && typeof window.parent.navigate === 'function') {
       window.parent.navigate(page);
       return;
