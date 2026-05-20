@@ -3,11 +3,17 @@ Face attendance app with static HTML screens and a Flask backend.
 Setup:
 
 1. Create a Supabase project.
-2. Run [`supabase_schema.sql`](/c:/Users/ayush/Desktop/chander sir/face-attendence/supabase_schema.sql) in the Supabase SQL editor.
-3. Copy [`.env.example`](/c:/Users/ayush/Desktop/chander sir/face-attendence/.env.example) to `.env` and fill in your Supabase values.
+2. Run `supabase_schema.sql` in the Supabase SQL editor.
+3. Copy `.env.example` to `.env` and fill in your Supabase values.
 4. Install dependencies with `pip install -r requirements.txt`.
 5. Run `python server.py`.
 6. Run `python main.py` if you want the desktop webview.
+
+Supabase config:
+
+- `SUPABASE_URL` must be the exact Project URL from Supabase Settings > API, for example `https://your-project-ref.supabase.co`.
+- After changing `.env`, restart `python server.py` or `python main.py`.
+- To check whether the configured host resolves, open `http://localhost:5050/api/health?check=true` while the backend is running.
 
 Flow:
 

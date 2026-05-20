@@ -21,8 +21,8 @@ import webview
 import os
 import sys
 import subprocess
-import threading
 import time
+from urllib import error, request
 
 def load_local_env():
     env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -38,41 +38,60 @@ def load_local_env():
 
 load_local_env()
 APP_PORT = int(os.getenv("APP_PORT", "5050"))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APP_URL = f"http://127.0.0.1:{APP_PORT}"
+
+
+def backend_is_ready():
+    try:
+        with request.urlopen(f"{APP_URL}/api/health", timeout=2) as response:
+            return response.status == 200
+    except error.URLError:
+        return False
+
 
 def start_server():
     """Start Flask server in background"""
+    if backend_is_ready():
+        print("Backend server already running")
+        return
+
     try:
         # Hide console window on Windows
         if sys.platform == "win32":
             subprocess.Popen(
-                ["python", "server.py"],
+                [sys.executable, "server.py"],
+                cwd=BASE_DIR,
                 creationflags=subprocess.CREATE_NO_WINDOW,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
         else:
             subprocess.Popen(
-                ["python", "server.py"],
+                [sys.executable, "server.py"],
+                cwd=BASE_DIR,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
-        print("✅ Backend server started")
+
+        for _ in range(20):
+            if backend_is_ready():
+                print("Backend server started")
+                return
+            time.sleep(0.25)
+
+        print("Backend server did not become ready. Try running python server.py in a terminal to see the error.")
     except Exception as e:
-        print(f"⚠️ Could not start server: {e}")
+        print(f"Could not start server: {e}")
         print("Make sure server.py exists in the same folder")
 
 def main():
-    # Start Flask server in background
-    threading.Thread(target=start_server, daemon=True).start()
-    
-    # Wait a bit for server to initialize
-    time.sleep(2)
-    app_url = f"http://127.0.0.1:{APP_PORT}"
+    start_server()
     
     # Create window
     webview.create_window(
         "Face Attendance System",
-        app_url,
+        APP_URL,
         width=1200,
         height=700,
         resizable=True,

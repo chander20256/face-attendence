@@ -2,6 +2,7 @@ import base64
 import io
 import json
 import os
+import socket
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 from urllib import error, parse, request
@@ -51,6 +52,7 @@ class SupabaseError(Exception):
 class SupabaseClient:
     def __init__(self, url: str, service_role_key: str):
         self.url = url
+        self.host = parse.urlparse(url).hostname or ""
         self.service_role_key = service_role_key
         self.opener = request.build_opener(request.ProxyHandler({}))
 
@@ -117,7 +119,7 @@ class SupabaseClient:
                 details = {"message": self._humanize_response_error(raw or str(exc))}
             raise SupabaseError(details.get("msg") or details.get("message") or str(details))
         except error.URLError as exc:
-            raise SupabaseError(f"Could not reach Supabase: {exc.reason}")
+            raise SupabaseError(self._humanize_url_error(exc.reason))
 
     def request_bytes(
         self,
@@ -145,7 +147,7 @@ class SupabaseClient:
             raw = exc.read().decode("utf-8", errors="ignore")
             raise SupabaseError(self._humanize_response_error(raw or str(exc)))
         except error.URLError as exc:
-            raise SupabaseError(f"Could not reach Supabase: {exc.reason}")
+            raise SupabaseError(self._humanize_url_error(exc.reason))
 
     @staticmethod
     def _humanize_response_error(raw: str) -> str:
@@ -153,6 +155,18 @@ class SupabaseClient:
         if "<html" in lower or "<!doctype html" in lower:
             return "Supabase returned an HTML page instead of the API response. Check SUPABASE_URL in .env and use the Project URL from Supabase Settings > API, for example https://your-project-ref.supabase.co"
         return raw
+
+    def _humanize_url_error(self, reason: Any) -> str:
+        reason_text = str(reason)
+        if isinstance(reason, socket.gaierror) or "getaddrinfo failed" in reason_text:
+            return (
+                f"Could not resolve Supabase host '{self.host}'. "
+                "Update SUPABASE_URL in .env with the exact Project URL from "
+                "Supabase Settings > API, then restart the app."
+            )
+        if "timed out" in reason_text.lower():
+            return "Supabase connection timed out. Check your internet connection and try again."
+        return f"Could not reach Supabase: {reason_text}"
 
     def table_select(
         self,
@@ -233,6 +247,11 @@ supabase = SupabaseClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) if SUPABASE_U
 def ensure_supabase() -> SupabaseClient:
     if not supabase:
         raise SupabaseError("Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.")
+    parsed = parse.urlparse(SUPABASE_URL)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise SupabaseError("SUPABASE_URL in .env must be a full URL like https://your-project-ref.supabase.co")
+    if parsed.hostname == "your-project-id.supabase.co":
+        raise SupabaseError("SUPABASE_URL still contains the example project id. Replace it with your real Supabase Project URL.")
     return supabase
 
 
@@ -753,11 +772,32 @@ def get_student_details(roll_no: str):
 @app.route("/api/health", methods=["GET"])
 def health_check():
     configured = bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY)
+    supabase_host = parse.urlparse(SUPABASE_URL).hostname if SUPABASE_URL else None
+    supabase_reachable = None
+    supabase_error = None
+
+    if flask_request.args.get("check") == "true" and configured:
+        try:
+            if not supabase_host:
+                raise SupabaseError("SUPABASE_URL in .env must be a full URL like https://your-project-ref.supabase.co")
+            socket.getaddrinfo(supabase_host, 443)
+            supabase_reachable = True
+        except SupabaseError as exc:
+            supabase_reachable = False
+            supabase_error = str(exc)
+        except OSError as exc:
+            supabase_reachable = False
+            supabase_error = SupabaseClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)._humanize_url_error(exc)
+
     return jsonify(
         {
             "status": "ok",
             "timestamp": now_ist().isoformat(),
             "supabase_configured": configured,
+            "supabase_url": SUPABASE_URL,
+            "supabase_host": supabase_host,
+            "supabase_reachable": supabase_reachable,
+            "supabase_error": supabase_error,
             "bucket": SUPABASE_BUCKET,
             "face_match_threshold": FACE_MATCH_THRESHOLD,
         }

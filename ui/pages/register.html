@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register — Green Hills Engineering College</title>
+<title>Register - Green Hills Engineering College</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -63,10 +63,10 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
   background: rgba(34,197,94,0.18);
 }
 
-/* ── LAYOUT ── */
+/* Layout */
 .layout { display:grid; grid-template-columns:340px 1fr; min-height:100vh; }
 
-/* ── LEFT PANEL ── */
+/* Left panel */
 .left-panel {
   background:linear-gradient(160deg,#14532d 0%,#166534 60%,#15803d 100%);
   padding:40px 32px;
@@ -105,7 +105,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
 .lp-bottom { margin-top:auto; font-size:12px; color:rgba(255,255,255,0.4); line-height:1.6; }
 .lp-bottom a { color:var(--green); text-decoration:none; cursor:pointer; }
 
-/* ── RIGHT PANEL ── */
+/* Right panel */
 .right-panel { padding:48px 52px; max-width:720px; }
 
 /* Progress bar */
@@ -574,21 +574,21 @@ body { font-family:'DM Sans',sans-serif; background:var(--pale); color:var(--tex
 <!-- Error Modal -->
 <div class="error-modal" id="errorModal">
   <div class="error-modal-content">
-    <div class="error-modal-icon">📷</div>
-    <div class="error-modal-title">Camera Access Issue</div>
+    <div class="error-modal-icon" id="errorModalIcon">Camera</div>
+    <div class="error-modal-title" id="errorModalTitle">Camera Access Issue</div>
     <div class="error-modal-message" id="errorModalMessage">
       Camera is not accessible. This could be because:<br><br>
-      • Another application is using the camera<br>
-      • Browser permissions are blocked<br>
-      • No camera is connected<br><br>
+      - Another application is using the camera<br>
+      - Browser permissions are blocked<br>
+      - No camera is connected<br><br>
       <strong>Solutions:</strong><br>
       1. Close other apps (Zoom, Teams, Skype, etc.)<br>
       2. Check browser camera permissions<br>
       3. Try a different browser (Chrome, Edge, Firefox)<br>
       4. Click "Upload Photos Instead" to continue
     </div>
-    <button onclick="closeErrorModal()">Try Again</button>
-    <button onclick="showUploadOption()">Upload Photos Instead</button>
+    <button id="errorModalCloseButton" onclick="closeErrorModal()">Try Again</button>
+    <button id="errorModalUploadButton" onclick="showUploadOption()">Upload Photos Instead</button>
   </div>
 </div>
 
@@ -632,9 +632,19 @@ function goHome() {
 // =====================================================================
 //  ERROR HANDLING
 // =====================================================================
-function showErrorModal(message) {
+function showErrorModal(message, options = {}) {
   const modal = document.getElementById('errorModal');
   const msgElement = document.getElementById('errorModalMessage');
+  const titleElement = document.getElementById('errorModalTitle');
+  const iconElement = document.getElementById('errorModalIcon');
+  const closeButton = document.getElementById('errorModalCloseButton');
+  const uploadButton = document.getElementById('errorModalUploadButton');
+
+  titleElement.textContent = options.title || 'Camera Access Issue';
+  iconElement.textContent = options.icon || 'Camera';
+  closeButton.textContent = options.closeText || 'Try Again';
+  uploadButton.style.display = options.allowUpload === false ? 'none' : 'inline-block';
+
   if (message) {
     msgElement.innerHTML = message;
   }
@@ -1098,15 +1108,33 @@ async function submitForm() {
     if (result.success) {
       showSuccess(payload.studentId);
     } else {
-      alert('Registration failed: ' + result.message);
+      showRegistrationError(result.message);
       btn.disabled    = false;
       btn.textContent = 'Complete Registration';
     }
   } catch(e) {
-    alert('Registration could not be completed. Please make sure the backend server and Supabase are configured.');
+    showRegistrationError('Registration could not be completed. Please make sure the backend server is running and try again.');
     btn.disabled    = false;
     btn.textContent = 'Complete Registration';
   }
+}
+
+function showRegistrationError(message) {
+  showErrorModal(escapeHtml(message || 'Registration failed. Please try again.'), {
+    title: 'Registration Failed',
+    icon: '!',
+    closeText: 'OK',
+    allowUpload: false
+  });
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function showSuccess(rollNo) {
